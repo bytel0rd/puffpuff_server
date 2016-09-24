@@ -1,0 +1,64 @@
+{
+  "name": "nubia",
+  "version": "0.0.0",
+  "description": "A new Trails.js Application",
+  "homepage": "http://trailsjs.io",
+  "author": {
+    "name": "john5117",
+    "email": "abiodunogundijo@gmail.com",
+    "url": "https://github.com/trailsjs"
+  },
+  "main": "index.js",
+  "keywords": [
+    "",
+    "trails",
+    "trailsjs"
+  ],
+  "dependencies": {
+    "body-parser": "~1.13.2",
+    "cookie-parser": "~1.3.5",
+    "debug": "~2.2.0",
+    "ejs": "~1.11.0",
+    "express": "^5.0.0-alpha.2",
+    "morgan": "~1.6.1",
+    "passport": "^0.3.2",
+    "passport-jwt": "^2.1.0",
+    "sails-disk": "^0.10.10",
+    "sails-memory": "^0.10.7",
+    "sails-mongo": "^0.12.1",
+    "serve-favicon": "~2.3.0",
+    "trailpack-acl": "^1.1.0",
+    "trailpack-autoreload": "^1.0.2",
+    "trailpack-core": "^1.0.0-beta-3",
+    "trailpack-express": "^1.0.14",
+    "trailpack-footprints": "^1.0.1",
+    "trailpack-gulp": "^1.0.2",
+    "trailpack-passport": "^1.0.0-beta-9",
+    "trailpack-repl": "^1.0.0-beta-3",
+    "trailpack-router": "^1.0.0-beta-4",
+    "trailpack-waterline": "^1.0.0-beta-1",
+    "trails": "^1.0.0-beta-1",
+    "trails-controller": "^1.0.0-beta-2",
+    "trails-model": "^1.0.0-beta-2",
+    "trails-policy": "^1.0.1",
+    "trails-service": "1.0.0-beta-2",
+    "winston": "^2.2"
+  },
+  "devDependencies": {
+    "eslint": "^2.8",
+    "eslint-config-trails": "latest",
+    "mocha": "^2.4",
+    "supertest": "^1.2"
+  },
+  "scripts": {
+    "test": "eslint . && mocha"
+  },
+  "engines": {
+    "node": ">= 4.0.0"
+  },
+  "eslintConfig": {
+    "extends": "trails"
+  },
+  "repository": "/nubia",
+  "license": "Apache-2.0"
+}

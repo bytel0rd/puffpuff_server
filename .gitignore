@@ -1,0 +1,5 @@
+## directories and files to ignore by Git
+node_modules
+.tmp
+coverage
+test.js
