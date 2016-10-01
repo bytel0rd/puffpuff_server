@@ -18,12 +18,12 @@ module.exports = {
   packs: [
     require('trailpack-core'),
     require('trailpack-repl'),
-    require('trailpack-autoreload'),
     require('trailpack-router'),
     require('trailpack-express'),
     require('trailpack-waterline'),
+    require('trailpack-passport'),
     require('trailpack-footprints'),
-    require('trailpack-passport')
+    require('trailpack-autoreload')
   ],
 
   /**

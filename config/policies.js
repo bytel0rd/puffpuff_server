@@ -14,8 +14,10 @@
 
 module.exports = {
 
-  DefaultController: {
-    info: [ ]
-  }
+  FootprintController: ['Passport.jwt'],
 
+  DefaultController: {
+    info: ['Auth.allowOnlyGet'],
+    test: ['Passport.jwt']
+  }
 }

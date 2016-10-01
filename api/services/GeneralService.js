@@ -16,7 +16,6 @@ module.exports = class GeneralService extends Service {
    * @return {[type]}  req.body or req.query   [description]
    */
   model(req) {
-    console.log(req.body)
     if (req.method === 'GET') return req.query
     return req.body
   }

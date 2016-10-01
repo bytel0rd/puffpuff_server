@@ -9,6 +9,14 @@ const ALGORITHM = 'HS256'
 const ISSUER = 'localhost'
 const AUDIENCE = 'localhost'
 
+const JWTOPTIONS = {
+  expiresInSeconds: EXPIRES_IN_SECONDS,
+  secret: SECRET,
+  algorithm: ALGORITHM,
+  issuer: ISSUER,
+  audience: AUDIENCE
+}
+
 module.exports = {
   redirect: {
     login: '/', //Login successful
@@ -21,13 +29,7 @@ module.exports = {
   strategies: {
     jwt: {
       strategy: JwtStrategy,
-      tokenOptions: {
-        expiresInSeconds: EXPIRES_IN_SECONDS,
-        secret: SECRET,
-        algorithm: ALGORITHM,
-        issuer: ISSUER,
-        audience: AUDIENCE
-      },
+      tokenOptions: JWTOPTIONS,
       options: {
         secretOrKey: SECRET,
         issuer: ISSUER,

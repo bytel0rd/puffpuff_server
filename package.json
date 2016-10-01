@@ -2,11 +2,11 @@
   "name": "nubia",
   "version": "0.0.0",
   "description": "A new Trails.js Application",
-  "homepage": "http://trailsjs.io",
+  "homepage": "https://github.com/john5117",
   "author": {
     "name": "john5117",
     "email": "abiodunogundijo@gmail.com",
-    "url": "https://github.com/trailsjs"
+    "url": "https://github.com/john5117"
   },
   "main": "index.js",
   "keywords": [

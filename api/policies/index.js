@@ -1,2 +1,2 @@
 'use strict'
-exports.Passport = require('./Passport')
+exports.Auth = require('./Auth')

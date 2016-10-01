@@ -8,7 +8,4 @@ const Controller = require('trails-controller')
  */
 module.exports = class FlourController extends Controller{
 
-  create(req, res){
-    res.status({mgs: 'coming back'})
-  }
 }

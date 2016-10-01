@@ -17,4 +17,10 @@ module.exports = class DefaultController extends Controller {
   info(req, res) {
     res.status(200).json(this.app.services.DefaultService.getApplicationInfo())
   }
+
+  test(req, res){
+    console.log(req.isAuthenticated())
+    console.log(req.user)
+    res.status(200).json(req.user)
+  }
 }

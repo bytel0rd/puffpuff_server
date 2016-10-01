@@ -23,6 +23,10 @@ module.exports = class Flour extends Model {
       owner: {
         model: 'User',
         required: true
+      },
+      isPost: {
+        boolean: true,
+        required: true
       }
     }
   }

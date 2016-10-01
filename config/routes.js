@@ -24,14 +24,27 @@ module.exports = [
    * Constrain the DefaultController.info handler to accept only GET requests.
    */
   {
-    method: [ 'GET' ],
+    method: ['GET'],
     path: '/api/v1/default/info',
     handler: 'DefaultController.info'
   },
 
   {
-    method: 'POST',
-    path: '/api/v1/auth/signUp',
-    handler: 'AuthController.signUp'
+    method: ['GET'],
+    path: '/api/v1/default/test',
+    handler: 'DefaultController.test'
+  },
+
+
+  {
+    method: ['GET', 'POST'],
+    path: '/api/v1/posts',
+    handler: 'PostController.base'
+  },
+
+  {
+    method: ['GET', 'PUT'],
+    path: '/api/v1/posts/{id}',
+    handler: 'PostController.params'
   }
 ]
