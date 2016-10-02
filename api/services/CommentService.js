@@ -14,17 +14,23 @@ module.exports = class CommentService extends Service {
    * passed.
    */
   sanitize(model) {
-    console.log('a', model);
     if (!model.base || !model.body || !model.owner) return true
     return false
   }
 
   /**
-   * setProp(model)
-   * returns the model with added properties
+   * setProp(req, res, model)
+   * returns the model with added properties or undefined
    */
-  setProp(model){
-    model['isPost'] = false
+  setProp(req, res, model) {
+    if (!req.isAuthenticated()) {
+      res.status(401).json({
+        mgs: 'unathorized access please login'
+      })
+      return undefined
+    }
+    model['owner'] = req.user.id
+    model['isPost'] = true
     return model
   }
 

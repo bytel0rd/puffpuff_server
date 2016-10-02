@@ -22,8 +22,10 @@ module.exports = class OrmService extends Service {
         mgs: 'invalid request parameters'
       })
     }
-    if (setProp) model = setProp(model)
-    model.owner = req.user.id
+    // setprop can return a vaild model or undefined so
+    // it is neccessary to check for undefined to avoid unneccersy execution.
+    if (setProp) model = setProp(req, res, model)
+    if (!model) return res.status(400).json({mgs: 'invalid parameters provided'})
     Orm.create(model)
       .then((data) => {
         return res.status(200).json(data)
@@ -77,15 +79,18 @@ module.exports = class OrmService extends Service {
    * orm is the waterline model for creation
    * santize is a custom function which satifies if the model is valid
    */
-  update(req, res, orm, sanitize) {
+  update(req, res, orm, sanitize, setProp) {
     const Orm = this.app.orm[orm]
-    const model = this.app.services.GeneralService.model(req)
+    let model = this.app.services.GeneralService.model(req)
     if (sanitize(model)) {
       return res.status(400).json({
         mgs: 'invalid request parameters'
       })
     }
-    model.owner = req.user.id
+    // setprop can return a vaild model or undefined so
+    // it is neccessary to check for undefined to avoid unneccersy execution.
+    if (setProp) model = setProp(req, res, model)
+    if (!model) return res.status(400).json({mgs: 'invalid parameters provided'})
     const query = {
       id: req.params.id,
       owner: req.user.id

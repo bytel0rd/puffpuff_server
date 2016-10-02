@@ -20,6 +20,6 @@ module.exports = class CommentController extends Controller {
   params(req, res) {
     const CommentService = this.app.services.CommentService;
 
-    (req.method === 'GET') ? CommentService.findOne(req, res): CommentService.update(req, res)
+    (req.method === 'GET') ? CommentService.findOne(req, res) : CommentService.update(req, res)
   }
 }

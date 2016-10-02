@@ -1,0 +1,277 @@
+# this is an example of the PuffPuff API
+# as a demonstration of an API spec in YAML
+swagger: '2.0'
+info:
+  title: PuffPuff API
+  description: Move your app forward with the PuffPuff API
+  version: "0.0.1"
+# the domain of the service
+host: api.puffpuff.com
+# array of all schemes that your API supports
+schemes:
+  # - https
+  - http
+  # - ws
+# will be prefixed to all paths
+basePath: /api/v1
+consumes:
+  - application/json
+produces:
+  - application/json
+paths:
+  /posts:
+    get:
+      summary: Posts List
+      description: |
+        The posts endpoint returns a response list of posts
+        from the request query provided.
+      parameters:
+        - name: id
+          in: query
+          description: |
+            returns  an array with a single child element like the 'posts/id'
+            because the query is done to find the posts with a single unique
+            identifer for the post.
+          required: false
+          type: string
+        - name: title
+          in: query
+          description: |
+            returns an array of posts which match the particular post title.
+          required: false
+          type: string
+        - name: category
+          in: query
+          description: |
+            an array of category that the posts belongs to.
+            when provided returns posts from a particular category specified.
+          type: string
+          required: false
+        - name: owner
+          in: query
+          description: |
+            a unique id for identifier for each user
+            when provided narrow the search to a particular user.
+          required: false
+          type: string
+      tags:
+        - Get
+        - Base
+        - Find
+        - Posts
+      responses:
+        200:
+          description: An array of Posts
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/Product'
+        409:
+          description: |
+            conflict responses is made due to invalid request querys.
+          schema:
+            $ref: '#/definitions/Error'
+        default:
+          description: Unexpected error
+          schema:
+            $ref: '#/definitions/Error'
+    post:
+      summary: Creates new Posts
+      description: |
+        To create a valid post request the users must be authenticated
+        this endpoint returns the newly created post object from
+        the request body.
+      tags:
+        - Post
+        - Posts
+        - Base
+        - Create
+      parameters:
+        - name: title
+          in: formData
+          description: |
+            title of the new post heading for browsing
+          required: true
+          type: string
+        - name: body
+          in: formData
+          description: |
+            texts or corpus
+          required: true
+          type: string
+        - name: category
+          in: formData
+          description: |
+            category in which the posts belongs to
+          required: true
+          type: string
+        - name: imgs
+          in: formData
+          description: |
+            an array of mutiple images uploaded by the user
+          required: false
+          type: file
+      responses:
+        201:
+          description: An array of Posts
+          schema:
+            # type: array
+            items:
+              $ref: '#/definitions/Product'
+        401:
+          description: |
+            aunthorized users access.
+          schema:
+            $ref: '#/definitions/Error'
+        400:
+          description: |
+            invalid and incomplete parameters sent .
+          schema:
+            $ref: '#/definitions/Error'
+        409:
+          description: |
+            conflict responses during post creation.
+          schema:
+            $ref: '#/definitions/Error'
+        default:
+          description: Unexpected error
+          schema:
+            $ref: '#/definitions/Error'
+
+  /posts/{id}:
+    get:
+      summary: Single Post
+      description: |
+        The posts endpoint returns a single post from
+        the request path parameter
+      parameters:
+        - name: id
+          in: path
+          description: |
+            unique identifier for the particular post to return
+          required: true
+          type: string
+      tags:
+        - Get
+        - Params
+        - single
+        - findOne
+        - Posts
+      responses:
+        200:
+          description: An array of Posts
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/Product'
+        409:
+          description: |
+            conflict responses is made due to invalid request querys.
+          schema:
+            $ref: '#/definitions/Error'
+        default:
+          description: Unexpected error
+          schema:
+            $ref: '#/definitions/Error'
+    put:
+      summary: Creates new Posts
+      description: |
+        To create a valid post request the users must be authenticated
+        this endpoint returns the newly updated post object from
+        the request body.
+      tags:
+        - Put
+        - Update
+        - Posts
+        - Params
+      parameters:
+        - name: id
+          in: path
+          description: |
+            unique identifier for the particular post to return
+          required: true
+          type: string
+        - name: title
+          in: formData
+          description: |
+            title of the new post heading for browsing
+          required: true
+          type: string
+        - name: body
+          in: formData
+          description: |
+            texts or corpus
+          required: true
+          type: string
+        - name: category
+          in: formData
+          description: |
+            category in which the posts belongs to
+          required: true
+          type: string
+        - name: imgs
+          in: formData
+          description: |
+            an array of mutiple images uploaded by the user
+          required: false
+          type: array
+          items:
+            type: string
+      responses:
+        200:
+          description: An array of Posts
+          schema:
+            # type: array
+            items:
+              $ref: '#/definitions/Product'
+        401:
+          description: |
+            aunthorized users access.
+          schema:
+            $ref: '#/definitions/Error'
+        400:
+          description: |
+            invalid and incomplete parameters sent .
+          schema:
+            $ref: '#/definitions/Error'
+        409:
+          description: |
+            conflict responses during post creation.
+          schema:
+            $ref: '#/definitions/Error'
+        default:
+          description: Unexpected error
+          schema:
+            $ref: '#/definitions/Error'
+
+
+#
+definitions:
+  Product:
+    type: object
+    properties:
+      product_id:
+        type: string
+        description: Unique identifier representing a specific product for a given latitude & longitude. For example, uberX in San Francisco will have a different product_id than uberX in Los Angeles.
+      description:
+        type: string
+        description: Description of product.
+      display_name:
+        type: string
+        description: Display name of product.
+      capacity:
+        type: string
+        description: Capacity of product. For example, 4 people.
+      image:
+        type: string
+        description: Image URL representing the product.
+  Error:
+    type: object
+    properties:
+      code:
+        type: integer
+        format: int32
+      message:
+        type: string
+      fields:
+        type: string

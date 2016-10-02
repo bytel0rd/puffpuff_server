@@ -14,16 +14,20 @@ module.exports = class PostService extends Service {
    * passed.
    */
   sanitize(model) {
-    console.log('a', model);
     if (!model.title || !model.body || !model.category) return true
     return false
   }
 
   /**
-   * setProp(model)
+   * setProp(req, res, model)
    * returns the model with added properties
    */
-  setProp(model){
+  setProp(req, res, model){
+    if (!req.isAuthenticated()) {
+      res.status(401).json({mgs: 'unathorized access please login'})
+      return undefined
+    }
+    model['owner'] = req.user.id
     model['isPost'] = true
     return model
   }
@@ -43,6 +47,8 @@ module.exports = class PostService extends Service {
    * find(req, res)
    * calls the OrmService find method with its required
    * parameters
+   *
+   * search query can contain {title, category, owner}
    */
   find(req, res) {
     this.app.services.OrmService.find(req, res, FLOUR)
