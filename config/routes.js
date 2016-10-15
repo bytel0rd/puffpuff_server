@@ -30,13 +30,6 @@ module.exports = [
   },
 
   {
-    method: ['GET'],
-    path: '/api/v1/default/test',
-    handler: 'DefaultController.test'
-  },
-
-
-  {
     method: ['GET', 'POST'],
     path: '/api/v1/posts',
     handler: 'PostController.base'
@@ -46,5 +39,35 @@ module.exports = [
     method: ['GET', 'PUT'],
     path: '/api/v1/posts/{id}',
     handler: 'PostController.params'
+  },
+
+  {
+    method: ['GET', 'POST'],
+    path: '/api/v1/comments',
+    handler: 'CommentController.base'
+  },
+
+  {
+    method: ['GET', 'PUT'],
+    path: '/api/v1/comments/{id}',
+    handler: 'CommentController.params'
+  },
+
+  {
+    method: ['GET'],
+    path: '/api/v1/info/{id}',
+    handler: 'IActionController.info'
+  },
+
+  {
+    method: ['GET', 'POST'],
+    path: '/api/v1/iaction',
+    handler: 'IActionController.base'
+  },
+
+  {
+    method: ['GET', 'PUT'],
+    path: '/api/v1/iaction/{id}',
+    handler: 'IActionController.params'
   }
 ]

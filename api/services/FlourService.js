@@ -10,8 +10,4 @@ const Service = require('trails-service')
  */
 module.exports = class FlourService extends Service {
 
-  create(req, res){
-    const model = this.app.services.GeneralService.model(req)
-    const Flour = this.app.orm.Flour
-  }
 }

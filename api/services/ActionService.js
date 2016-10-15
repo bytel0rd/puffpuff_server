@@ -10,24 +10,45 @@ const ACTION = 'Action'
  */
 module.exports = class ActionService extends Service {
 
+  test(){
+    this.app.log.info('this is working')
+  }
   // TODO: looks like am sorry for this waterfall paradim would refactor the code
   // to accomodate ES17 async and await for Info method
   // this module should expanded for more flexibity
 
   /**
    * create(req,res)
+   * since Action is almost generic it has to implement
+   * a check before creating action so has to avoid duplication.
    * creates a new action from the request and returns a response
    * of the newly created action back to the user.
    */
   create(req, res) {
-    const model = this.app.services.GeneralService.model(req)
-    const creator = this.app.services.GeneralService.create
-    if (this.santize(model)) {
+    let model = this.app.services.OrmService.model(req)
+    const Action = this.app.orm.Action
+    const creator = this.app.services.OrmService.create
+    const done = this.app.services.GeneralService.done
+
+    if (!this.santize(model)) {
+      return res.status(400).json({
+        mgs: 'invalid query or parameters provided'
+      })
+    }
+    model = this.setProp(req, res, model)
+    if (!model) {
+      return res.status(400).json({
+        mgs: 'invalid query or parameters provided'
+      })
+    }
+    if (model.type === 'view' && model.owner === 'guest') {
       return creator(req, res, ACTION, this.sanitize, this.setProp)
     }
-    return res.status(400).json({
-      mgs: 'invalid query or parameters provided'
-    })
+    return Action.findOne(model)
+      .then((data) => {
+        if (data !== {}) return res.status(200).json(data)
+        return creator(req, res, ACTION, this.sanitize, this.setProp, done)
+      })
   }
 
   /**
@@ -36,7 +57,7 @@ module.exports = class ActionService extends Service {
    * by the request.
    */
   find(req, res) {
-    return this.app.services.GeneralService.find(req, res, ACTION)
+    return this.app.services.OrmService.find(req, res, ACTION)
   }
 
   /**
@@ -45,7 +66,7 @@ module.exports = class ActionService extends Service {
    * ID in the url path.
    */
   findOne(req, res) {
-    return this.app.services.GeneralService.findOne(req, res, ACTION)
+    return this.app.services.OrmService.findOne(req, res, ACTION)
   }
 
   /**
@@ -54,7 +75,8 @@ module.exports = class ActionService extends Service {
    * req.params.id
    */
   update(req, res) {
-    return this.app.services.GeneralService.update(req, res, ACTION, this.sanitize, this.setProp)
+    const done = this.app.services.GeneralService.done
+    return this.app.services.OrmService.update(req, res, ACTION, this.sanitize, this.setProp, done)
   }
 
   /**
@@ -66,7 +88,7 @@ module.exports = class ActionService extends Service {
    * this particular method creates a chain reaction that calculates the
    * total action info which include {likes, dislikes, isLiked, isDisliked }
    */
-  Infos(req, res) {
+  info(req, res) {
     const Action = this.app.orm.Action
     const data = {}
     const query = {}

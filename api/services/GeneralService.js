@@ -20,4 +20,8 @@ module.exports = class GeneralService extends Service {
     return req.body
   }
 
+  done(data){
+
+  }
+
 }

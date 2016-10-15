@@ -29,7 +29,7 @@ module.exports = class PaginateService extends Service {
    */
 
   paginate(query, data){
-    const limit = query.limit || 10
+    const limit = query.limit || 3
     const skipped = query.skipped || 0
     data.skipped = limit + skipped
     return data

@@ -38,6 +38,12 @@ module.exports = {
       adapter: require('sails-disk'),
       migrate: 'alter'
     }
+    // ,
+    //
+    // stage: {
+    //   adapter: require('sails-mongo'),
+    //   migrate: 'alter'
+    // }
 
   },
 

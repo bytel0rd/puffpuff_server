@@ -41,7 +41,8 @@ module.exports = class CommentService extends Service {
    * parameters
    */
   create(req, res) {
-    this.app.services.OrmService.create(req, res, FLOUR, this.sanitize, this.setProp)
+    const done = this.app.services.GeneralService.done
+    this.app.services.OrmService.create(req, res, FLOUR, this.sanitize, this.setProp, done)
   }
 
   /**
@@ -71,7 +72,8 @@ module.exports = class CommentService extends Service {
    * parameters
    */
   update(req, res) {
-    this.app.services.OrmService.find(req, res, FLOUR, this.sanitize)
+    const done = this.app.services.GeneralService.done
+    this.app.services.OrmService.find(req, res, FLOUR, this.sanitize, done)
   }
 
 }

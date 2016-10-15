@@ -19,6 +19,86 @@ consumes:
 produces:
   - application/json
 paths:
+  /dashboard:
+    get:
+      summary: personal user details
+      description: |
+        returns updated personal information and requires the user to be login
+      tags:
+        - Get
+        - Auth
+        - Find
+        - dashBoard
+      responses:
+        200:
+          description: A single user bio
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/user'
+        409:
+          description: |
+            conflict responses is made due to invalid request querys.
+          schema:
+            $ref: '#/definitions/Error'
+        default:
+          description: Unexpected error
+          schema:
+            $ref: '#/definitions/Error'
+    put:
+      summary: updates private biodata
+      description: |
+        updates userbiodata with querys or formdata provided by the user
+      tags:
+        - Put
+        - Update
+        - Auth
+        - dashBoard
+      parameters:
+        - name: surname
+          in: formData
+          description: |
+            new surname for current user
+          required: true
+          type: string
+        - name: lastname
+          in: formData
+          description: |
+            new lastname for current user
+          required: true
+          type: string
+        - name: dob
+          in: formData
+          description: |
+            new date of birth for current user
+          required: true
+          type: string
+      responses:
+        200:
+          description: updated userBio
+          schema:
+            # type: array
+            items:
+              $ref: '#/definitions/user'
+        401:
+          description: |
+            aunthorized users access.
+          schema:
+            $ref: '#/definitions/Error'
+        400:
+          description: |
+            invalid and incomplete parameters sent .
+          schema:
+            $ref: '#/definitions/Error'
+        409:
+          description: |
+            conflict responses during post creation.
+          schema:
+            $ref: '#/definitions/Error'
+        default:
+          description: Unexpected error
+          schema:
+            $ref: '#/definitions/Error'
   /posts:
     get:
       summary: Posts List
@@ -65,7 +145,7 @@ paths:
           schema:
             type: array
             items:
-              $ref: '#/definitions/Product'
+              $ref: '#/definitions/post'
         409:
           description: |
             conflict responses is made due to invalid request querys.
@@ -115,9 +195,7 @@ paths:
         201:
           description: An array of Posts
           schema:
-            # type: array
-            items:
-              $ref: '#/definitions/Product'
+            $ref: '#/definitions/post'
         401:
           description: |
             aunthorized users access.
@@ -163,7 +241,7 @@ paths:
           schema:
             type: array
             items:
-              $ref: '#/definitions/Product'
+              $ref: '#/definitions/post'
         409:
           description: |
             conflict responses is made due to invalid request querys.
@@ -223,7 +301,7 @@ paths:
           schema:
             # type: array
             items:
-              $ref: '#/definitions/Product'
+              $ref: '#/definitions/post'
         401:
           description: |
             aunthorized users access.
@@ -243,28 +321,521 @@ paths:
           description: Unexpected error
           schema:
             $ref: '#/definitions/Error'
+  /comments:
+    get:
+      summary: Comment List
+      description: |
+        The comments endpoint returns a response list of comments
+        from the request query provided.
+      parameters:
+        - name: id
+          in: query
+          description: |
+            returns  an array with a single child element like the 'comments/id'
+            because the query is done to find the comments with a single unique
+            identifer for the post.
+          required: false
+          type: string
+        - name: owner
+          in: query
+          description: |
+            a unique id for identifier for each user
+            when provided narrow the search to a particular user.
+          required: false
+          type: string
+      tags:
+        - Get
+        - Base
+        - Find
+        - comments
+      responses:
+        200:
+          description: An array of comments
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/comment'
+        409:
+          description: |
+            conflict responses is made due to invalid request querys.
+          schema:
+            $ref: '#/definitions/Error'
+        default:
+          description: Unexpected error
+          schema:
+            $ref: '#/definitions/Error'
+    post:
+      summary: Creates new Comment
+      description: |
+        To create a valid post request the users must be authenticated
+        this endpoint returns the newly created post object from
+        the request body.
+      tags:
+        - Comment
+        - comments
+        - Base
+        - Create
+      parameters:
+        - name: base
+          in: formData
+          description: |
+            id of the post under which the comment is made
+          required: true
+          type: string
+        - name: body
+          in: formData
+          description: |
+            texts or corpus of comment
+          required: true
+          type: string
+        - name: owner
+          in: formData
+          description: |
+            unique id for the creator of the comment
+          required: true
+          type: string
+      responses:
+        201:
+          description: An array of Comments
+          schema:
+            $ref: '#/definitions/comment'
+        401:
+          description: |
+            unauthorized users access.
+          schema:
+            $ref: '#/definitions/Error'
+        400:
+          description: |
+            invalid and incomplete parameters sent .
+          schema:
+            $ref: '#/definitions/Error'
+        409:
+          description: |
+            conflict responses during post creation.
+          schema:
+            $ref: '#/definitions/Error'
+        default:
+          description: Unexpected error
+          schema:
+            $ref: '#/definitions/Error'
 
+  /comments/{id}:
+    get:
+      summary: Single Comment
+      description: |
+        The posts endpoint returns a single comment from
+        the request path parameter
+      parameters:
+        - name: id
+          in: path
+          description: |
+            unique identifier for the particular comment to return
+          required: true
+          type: string
+      tags:
+        - Get
+        - Params
+        - single
+        - findOne
+        - comments
+      responses:
+        200:
+          description: A single unique comment
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/comment'
+        409:
+          description: |
+            conflict responses is made due to invalid request querys.
+          schema:
+            $ref: '#/definitions/Error'
+        default:
+          description: Unexpected error
+          schema:
+            $ref: '#/definitions/Error'
+    put:
+      summary: Creates new comment
+      description: |
+        To create a valid comment request the users must be authenticated
+        this endpoint returns the newly updated comment object from
+        the request body.
+      tags:
+        - Put
+        - Update
+        - comments
+        - Params
+      parameters:
+        - name: id
+          in: path
+          description: |
+            unique identifier for the particular comment to update and to return
+          required: true
+          type: string
+        - name: base
+          in: formData
+          description: |
+            unique id for the post under which the comment is made
+          required: true
+          type: string
+        - name: body
+          in: formData
+          description: |
+            texts or corpus in the comment
+          required: true
+          type: string
+        - name: owner
+          in: formData
+          description: |
+            uniwue id for the owner or author of the comment
+          required: true
+          type: string
+        - name: imgsUrl
+          in: formData
+          description: |
+            mutiple  img uploaded array
+          required: false
+          type: file
+      responses:
+        200:
+          description: An updated  comment
+          schema:
+            # type: array
+            items:
+              $ref: '#/definitions/comment'
+        401:
+          description: |
+            aunthorized users access.
+          schema:
+            $ref: '#/definitions/Error'
+        400:
+          description: |
+            invalid and incomplete parameters sent .
+          schema:
+            $ref: '#/definitions/Error'
+        409:
+          description: |
+            conflict responses during post creation.
+          schema:
+            $ref: '#/definitions/Error'
+        default:
+          description: Unexpected error
+          schema:
+            $ref: '#/definitions/Error'
+  /iaction:
+    get:
+      summary: action List
+      description: |
+        perfoms an action query search with parameters provide in the query
+      parameters:
+        - name: id
+          in: query
+          description: |
+            returns  an array with a single child element like the 'comments/id'
+            because the query is done to find the comments with a single unique
+            identifer for the post.
+          required: false
+          type: string
+        - name: owner
+          in: query
+          description: |
+            a unique id for identifier for each user
+            when provided narrow the search to a particular user.
+          required: false
+          type: string
+        - name: type
+          in: query
+          description: |
+            type of action to search for params include ['view','like','dislike']
+          required: false
+          type: string
+        - name: flour
+          in: query
+          description: |
+            a unique id for identifier for the post or comment to search on
+          required: false
+          type: string
+      tags:
+        - Get
+        - Base
+        - Find
+        - Actions
+      responses:
+        200:
+          description: An array of actions
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/action'
+        409:
+          description: |
+            conflict responses is made due to invalid request querys.
+          schema:
+            $ref: '#/definitions/Error'
+        default:
+          description: Unexpected error
+          schema:
+            $ref: '#/definitions/Error'
+    post:
+      summary: Creates new action
+      description: |
+        To create a valid action request the users must be authenticated
+        this endpoint returns the newly created action object from
+        the request body.
+      tags:
+        - Post
+        - Actions
+        - Base
+        - Create
+      parameters:
+        - name: owner
+          in: formData
+          description: |
+            unique id for the creator of the action
+          required: true
+          type: string
+        - name: type
+          in: formData
+          description: |
+            type of action to be performed
+          required: true
+          type: string
+        - name: flour
+          in: formData
+          description: |
+            unique id for the item {post or comment} action was performed on
+          required: true
+          type: string
+      responses:
+        201:
+          description: A newly created Action
+          schema:
+            $ref: '#/definitions/action'
+        401:
+          description: |
+            unauthorized users access.
+          schema:
+            $ref: '#/definitions/Error'
+        400:
+          description: |
+            invalid and incomplete parameters sent .
+          schema:
+            $ref: '#/definitions/Error'
+        409:
+          description: |
+            conflict responses during post creation.
+          schema:
+            $ref: '#/definitions/Error'
+        default:
+          description: Unexpected error
+          schema:
+            $ref: '#/definitions/Error'
 
-#
+  /iaction/{id}:
+    get:
+      summary: Single Action
+      description: |
+        The iaction endpoint returns a single comment from
+        the request path parameter iaction/id
+      parameters:
+        - name: id
+          in: path
+          description: |
+            unique identifier for the particular action to return
+          required: true
+          type: string
+      tags:
+        - Get
+        - Params
+        - single
+        - findOne
+        - actions
+      responses:
+        200:
+          description: A single unique action
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/action'
+        409:
+          description: |
+            conflict responses is made due to invalid request querys.
+          schema:
+            $ref: '#/definitions/Error'
+        default:
+          description: Unexpected error
+          schema:
+            $ref: '#/definitions/Error'
+    put:
+      summary: updates an action
+      description: |
+        To create a valid action request the users must be authenticated
+        this endpoint returns the newly updated action object from
+        the request body.
+      tags:
+        - Put
+        - Update
+        - actions
+        - Params
+      parameters:
+        - name: id
+          in: path
+          description: |
+            unique identifier for the particular action to update and to return
+          required: true
+          type: string
+        - name: flour
+          in: formData
+          description: |
+            unique id for the post or comment in which action was made
+          required: true
+          type: string
+        - name: type
+          in: formData
+          description: |
+            type of action to be performed
+          required: true
+          type: string
+        - name: owner
+          in: formData
+          description: |
+            uniwue id for the owner or author of the action
+          required: true
+          type: string
+        - name: imgsUrl
+          in: formData
+          description: |
+            mutiple  img uploaded array
+          required: false
+          type: file
+      responses:
+        200:
+          description: An updated  action is returned
+          schema:
+            # type: array
+            items:
+              $ref: '#/definitions/comment'
+        401:
+          description: |
+            aunthorized users access.
+          schema:
+            $ref: '#/definitions/Error'
+        400:
+          description: |
+            invalid and incomplete parameters sent .
+          schema:
+            $ref: '#/definitions/Error'
+        409:
+          description: |
+            conflict responses during post creation.
+          schema:
+            $ref: '#/definitions/Error'
+        default:
+          description: Unexpected error
+          schema:
+            $ref: '#/definitions/Error'
 definitions:
-  Product:
+  user:
     type: object
     properties:
-      product_id:
+      _id:
         type: string
         description: Unique identifier representing a specific product for a given latitude & longitude. For example, uberX in San Francisco will have a different product_id than uberX in Los Angeles.
-      description:
+      email:
         type: string
         description: Description of product.
-      display_name:
+      username:
         type: string
         description: Display name of product.
-      capacity:
+      surname:
         type: string
         description: Capacity of product. For example, 4 people.
-      image:
+      lastname:
         type: string
         description: Image URL representing the product.
+      gender:
+        type: string
+      dob:
+        type: string
+      activated:
+        type: boolean
+  post:
+    type: object
+    properties:
+      _id:
+        type: string
+        description: Unique identifier representing a specific product for a given latitude & longitude. For example, uberX in San Francisco will have a different product_id than uberX in Los Angeles.
+      base:
+        type: string
+        description: Description of product.
+      title:
+        type: string
+        description: Display name of product.
+      body:
+        type: string
+        description: Capacity of product. For example, 4 people.
+      owner:
+        type: string
+        description: Image URL representing the product.
+      imgsUrl:
+        type: array
+        items:
+          type: string
+      isPost:
+        type: boolean
+  comment:
+    type: object
+    properties:
+      _id:
+        type: string
+        description: Unique identifier representing a specific product for a given latitude & longitude. For example, uberX in San Francisco will have a different product_id than uberX in Los Angeles.
+      body:
+        type: string
+        description: Description of product.
+      owner:
+        type: string
+        description: Display name of product.
+      base:
+        type: string
+        description: Capacity of product. For example, 4 people.
+      imgsUrl:
+        type: array
+        items:
+          type: string
+      isPost:
+        type: boolean
+  action:
+    type: object
+    properties:
+      _id:
+        type: string
+        description: Unique identifier representing a specific product for a given latitude & longitude. For example, uberX in San Francisco will have a different product_id than uberX in Los Angeles.
+      owner:
+        type: string
+        description: Description of product.
+      type:
+        type: string
+        description: Display name of product.
+      flour:
+        type: string
+        description: Capacity of product. For example, 4 people.
+  paginated:
+    type: object
+    properties:
+      data:
+        type: array
+        items: 
+          type: object
+        description: Unique identifier representing a specific product for a given latitude & longitude. For example, uberX in San Francisco will have a different product_id than uberX in Los Angeles.
+      skipped:
+        type: number
+        description: Description of product.
+      limit:
+        type: number
+        description: Display name of product.
+      total:
+        type: number
+        description: Capacity of product. For example, 4 people.
   Error:
     type: object
     properties:

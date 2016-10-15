@@ -13,7 +13,7 @@ module.exports = class AuthPolicy extends Policy {
    * only allows get for unAuthorized users
    */
   allowOnlyGet(req, res, next) {
-    return (req.method === 'GET') ? next() : (req.isAuthenticated()) ? next() : res.status(401).json({
+    (req.method === 'GET') ? next() : (req.isAuthenticated()) ? next() : res.status(401).json({
       mgs: 'unAuthorized'
     })
   }

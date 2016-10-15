@@ -7,27 +7,45 @@ const Service = require('trails-service')
 module.exports = class OrmService extends Service {
 
   /**
-   * create(req, res, orm, santize, setProp)
+   * create(req, res, orm, santize, setProp, done) 6 args
    * if valid request is valid it returns the created object
    * req and res for query and response
    * orm is the waterline model for creation
    * santize is a custom function which satifies if the model is valid
    * setProp is a custom function which adds custom properties to the desired model
+   * done is a custom function which is passed the newly created data
+   * create(req, res, orm, done) 4 args
+   * create(req, res, orm, santize, done) 5 ars
    */
-  create(req, res, orm, sanitize, setProp) {
+  create(req, res, orm, sanitize, setProp, done) {
     const Orm = this.app.orm[orm]
     let model = this.app.services.GeneralService.model(req)
-    if (sanitize(model)) {
-      return res.status(400).json({
-        mgs: 'invalid request parameters'
+      // throw an error if aruments provided not enough
+    if (arguments.length < 4) throw 'invalid arguments provided for orm service'
+    // mappind the done method to the last argument provided
+    if (arguments.length === 4) arguments[3] = done
+    if (arguments.length === 5) arguments[4] = done
+    // if santize fuction is provided
+    if (arguments.length > 4) {
+      if (sanitize(model)) {
+        return res.status(400).json({
+          mgs: 'invalid request parameters'
+        })
+      }
+    }
+      // setprop can return a vaild model or undefined so
+      // it is neccessary to check for undefined to avoid unneccersy execution.
+    if (arguments.length === 6) {
+      model = setProp(req, res, model)
+      if (!model) return res.status(400).json({
+        mgs: 'invalid parameters provided'
       })
     }
-    // setprop can return a vaild model or undefined so
-    // it is neccessary to check for undefined to avoid unneccersy execution.
-    if (setProp) model = setProp(req, res, model)
-    if (!model) return res.status(400).json({mgs: 'invalid parameters provided'})
+
     Orm.create(model)
       .then((data) => {
+        // finally the done fuction is called on the data before response
+        if (done) done(data)
         return res.status(200).json(data)
       })
       .catch((err) => {
@@ -73,30 +91,48 @@ module.exports = class OrmService extends Service {
   }
 
   /**
-   * update(req, res, orm, santize)
+   * update(req, res, orm, santize, setProp, done) 6 args
    * if valid request is valid it returns the updated object
    * req and res for query and response
    * orm is the waterline model for creation
    * santize is a custom function which satifies if the model is valid
+   * done is a custom function which is passed the newly created data
+   * update(req, res, orm, done) 4 args
+   * update(req, res, orm, santize, done) 5 args
    */
-  update(req, res, orm, sanitize, setProp) {
+  update(req, res, orm, sanitize, setProp, done) {
     const Orm = this.app.orm[orm]
     let model = this.app.services.GeneralService.model(req)
-    if (sanitize(model)) {
-      return res.status(400).json({
-        mgs: 'invalid request parameters'
-      })
+    // throw an err if invalid parameters where provided
+    if (arguments.length < 4) throw 'invalid parameters provided in the OrmService update'
+    // manual mapping of done to the last argument
+    if (arguments.length === 4) arguments[3] = done
+    if (arguments.length === 5) arguments[4] = done
+    //  checks the model validity when the parameter is provided.
+    if (arguments.length > 4) {
+      if (sanitize(model)) {
+        return res.status(400).json({
+          mgs: 'invalid request parameters'
+        })
+      }
     }
     // setprop can return a vaild model or undefined so
     // it is neccessary to check for undefined to avoid unneccersy execution.
-    if (setProp) model = setProp(req, res, model)
-    if (!model) return res.status(400).json({mgs: 'invalid parameters provided'})
+    if (arguments.length === 6) {
+      model = setProp(req, res, model)
+      if (!model) return res.status(400).json({
+        mgs: 'invalid parameters provided'
+      })
+    }
+    // custom query for updating
     const query = {
       id: req.params.id,
       owner: req.user.id
     }
+    // update the orm with the query provided
     Orm.update(query, model)
       .then((data) => {
+        if (done) done(data)
         return res.status(200).json(data)
       })
       .catch((err) => {
