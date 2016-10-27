@@ -10,6 +10,11 @@ const Connect = 'Connect'
  */
 module.exports = class ConnectService extends Service {
 
+  create(req, res){
+    const done = this.app.services.GeneralService.done
+    this.app.services.OrmService.create(req, res, Connect, this.sanitize, this.setProp, done)
+  }
+
   find(req, res) {
     req = this.lock(req)
     return this.app.services.OrmService.find(req, res, Connect)
@@ -40,6 +45,18 @@ module.exports = class ConnectService extends Service {
           'mgs': 'dbConflict'
         })
       })
+  }
+
+  // checks if the model is a valid model
+  sanitize(model){
+    return (!model.Konnect) ? true : false
+  }
+
+  // sets the user owner id on the model
+  setProp(req, res, model){
+    if (!req.isAuthenticated()) return undefined
+    model.owner = req.user.id
+    return model
   }
 
   // to restrict and secure req query or body

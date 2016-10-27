@@ -39,7 +39,8 @@ module.exports = class User extends Model {
       // lastname: 'string',
       // gender: {
       //   type: 'string',
-      //   enum: ['male', 'female']
+      //   enum: ['male', 'female'],
+      //   required: true
       // },
       // dob: {
       //   type: 'date',

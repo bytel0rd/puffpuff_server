@@ -1,4 +1,5 @@
 const Service = require('trails-service')
+const co = require('co')
 
 /**
  * @module OrmService
@@ -26,6 +27,7 @@ module.exports = class OrmService extends Service {
     if (arguments.length === 4) arguments[3] = done
     if (arguments.length === 5) arguments[4] = done
     // if santize fuction is provided
+    // santize returns true if model validation fail but false otherwise
     if (arguments.length > 4) {
       if (sanitize(model)) {
         return res.status(400).json({
@@ -56,34 +58,65 @@ module.exports = class OrmService extends Service {
   }
 
   /**
-   * find(req, res, orm)
+   * find(req, res, orm, tquery)
    * if valid query is passed return an array of objects
    * req and res for query and response
    * orm is the model to query
+   * Tquery is a function that takes the query and
+   * returns a modified query
    */
-  find(req, res, orm) {
+  find(req, res, orm, tquery) {
     const Orm = this.app.orm[orm]
+    const paginate = this.app.services.PaginateService
+    const pageOpts =  this.app.config.generic.paginate
     const model = this.app.services.GeneralService.model(req)
+    // retrives sanitized query for count query
+    const countQuery = paginate.countQuery(model)
+    // retrives sanitized query for find query
+    const findQuery = paginate.mapModel(model, paginate.creteria())
+    // sets query Limt
+    findQuery['limit'] = findQuery.limit || pageOpts.limit
+    //  sets query skip
+    findQuery['skip'] = findQuery.skip || pageOpts.skip
 
-    Orm.find(model)
-      .then((orms) => res.status(200).json(orms))
+    // generator function to accumulate the count , data, limit and skip
+    co(function* () {
+      const result = {}
+      // collate data
+      let query = Orm.find(findQuery)
+      if (tquery) query =  tquery(findQuery)
+      // retrive find has data
+      result['data'] = yield query
+      // retrive count
+      result['count'] = yield Orm.count(countQuery)
+      // retrive Limt
+      result['limit'] = findQuery.limit
+      //  retrive skip
+      result['skip'] = findQuery.skip
+
+      return result
+
+    }).then((result) => res.status(200).json(result))
       .catch((err) => res.status(409).json({
         mgs: 'invalid request parameters'
       }))
   }
 
   /**
-   * findOne(req, res, orm)
+   * findOne(req, res, orm, tquery)
    * if valid query is passed return a single object
    * req and res for query and response
    * orm is the model to query
+   * tquery takes and return modified query
    */
-  findOne(req, res, orm) {
+  findOne(req, res, orm, tquery) {
     const Orm = this.app.orm[orm]
-    const query = {
+    const dbquery = {
       id: req.params.id
     }
-    Orm.findOne(query)
+    let query = Orm.findOne(dbquery)
+    if (tquery) query =  tquery(query)
+    query
       .then((orm) => res.status(200).json(orm))
       .catch((err) => res.status(409).json({
         mgs: 'invalid request parameters'

@@ -10,5 +10,6 @@ exports.session = require('./session')
 exports.views = require('./views')
 exports.web = require('./web')
 
+exports.generic = require('./generic')
 
 exports.passport = require('./passport')
