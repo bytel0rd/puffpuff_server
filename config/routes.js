@@ -28,6 +28,23 @@ module.exports = [
     path: '/api/v1/default/info',
     handler: 'DefaultController.info'
   },
+  {
+    method: ['GET'],
+    path: '/api/v1/feed',
+    handler: 'HavenController.feedBase'
+  },
+
+  {
+    method: ['GET'],
+    path: '/api/v1/feed/{id}',
+    handler: 'HavenController.feedparams'
+  },
+
+  {
+    method: ['GET'],
+    path: '/api/v1/trends',
+    handler: 'HavenController.trends'
+  },
 
   {
     method: ['GET', 'POST'],

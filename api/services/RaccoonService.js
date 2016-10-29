@@ -184,4 +184,28 @@ module.exports = class RaccoonService extends Service {
     })
   }
 
+  /**
+   * bestRated([callback])
+   */
+  bestRated(callback){
+    return new Promise( (resolve, reject) => {
+      return this.raccoon.bestRated( (result) => {
+        if (typeof callback === 'function') callback(result)
+        resolve(result)
+      })
+    })
+  }
+
+  /**
+   * worstRated([callback])
+   */
+  worstRated(callback){
+    return new Promise( (resolve, reject) => {
+      return this.raccoon.worstRated( (result) => {
+        if (typeof callback === 'function') callback(result)
+        resolve(result)
+      })
+    })
+  }
+
 }
