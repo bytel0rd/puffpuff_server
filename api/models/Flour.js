@@ -15,7 +15,6 @@ module.exports = class Flour extends Model {
     return {
       title: {type: 'string'},
       body: {type: 'string', required: true},
-      category: {type: 'array'},
       imgsUrl: {type: 'array'},
       base: {
         model: 'Flour'
@@ -24,10 +23,7 @@ module.exports = class Flour extends Model {
         model: 'User',
         required: true
       },
-      isPost: {
-        boolean: true,
-        required: true
-      }
+      type: {type: 'string', required: true}
     }
   }
 }

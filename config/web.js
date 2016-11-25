@@ -19,7 +19,13 @@ module.exports = {
    * Can be true/false or an object of CORS options
    * @see {@link https://github.com/expressjs/cors#configuring-cors}
    */
-  cors: false,
+  cors: {
+    // origin:function (req, callback) {
+    //   return callback(req.headers.origin)
+    // }
+    preflightContinue: true
+  },
+  // true,
 
   /**
    * Middlewares to load (in order)

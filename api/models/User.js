@@ -16,21 +16,19 @@ module.exports = class User extends Model {
         type: 'string',
         unique: true,
         email: true,
-        // lowercase: true,
         required: true
       },
       passports: {
         collection: 'Passport',
         via: 'user'
+      },
+      username: {
+        type: 'string',
+        unique: true,
+        min: 5,
+        max: 15,
+        required: true
       }
-      // username: {
-      //   type: 'string',
-      //   unique: true,
-      //   lowercase: true,
-      //   min: 5,
-      //   max: 15,
-      //   required: true
-      // }
       // ,
       // surname: {
       //   type: 'string',

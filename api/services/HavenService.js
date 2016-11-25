@@ -4,7 +4,7 @@ const Service = require('trails-service')
 const co = require('co')
 const _ = require('lodash')
 const moment = require('moment-timezone')
-const Connect = 'Connect'
+// const Connect = 'Connect'
 const Flour = 'Flour'
   /**
    * @module HavenService
@@ -35,7 +35,7 @@ module.exports = class HavenService extends Service {
       return yield base.trending(userId)
     })(this).then((feed) => {
       // gets formated data
-      const data = this.app.services.GeneralService.formatResp(feed)
+      const data = this.app.services.GeneralService.formatResp(req, feed)
       // adds the userId to the formated data
       data['userId'] = userId
       // return the formated data
@@ -64,7 +64,7 @@ module.exports = class HavenService extends Service {
       // return if there is no skip but there is no limit
       return yield base.trending()
     })(this).then((trends) => {
-      res.status(200).json(this.app.services.GeneralService.formatResp(trends))
+      res.status(200).json(this.app.services.GeneralService.formatResp(req, trends))
     }).catch( (err) => res.status(400).json(err))
   }
 
@@ -76,15 +76,15 @@ module.exports = class HavenService extends Service {
    */
   feedQuery(userId) {
     // query to locate user konnects
-    const konnectQuery = {
-      or: [{
-        owner: userId,
-        accepted: true
-      }, {
-        Konnect: userId,
-        accepted: true
-      }]
-    }
+    // const konnectQuery = {
+    //   or: [{
+    //     owner: userId,
+    //     accepted: true
+    //   }, {
+    //     Konnect: userId,
+    //     accepted: true
+    //   }]
+    // }
 
     // generator function
     return co.wrap(function*(app) {
@@ -95,22 +95,25 @@ module.exports = class HavenService extends Service {
         // gets all user activities
       const activity = yield raccoon.allWatchedFor(userId)
         // gets all konnects ids for relative coments
-      const konnects = _.map(yield app.orm[Connect].find(konnectQuery), (Konnect) => {
-        if (Konnect.owner === userId) return Konnect.accepted
-        return Konnect.owner
-      })
+      // const konnects = _.map(yield app.orm[Connect].find(konnectQuery), (Konnect) => {
+      //   if (Konnect.owner === userId) return Konnect.accepted
+      //   return Konnect.owner
+      // })
 
       // comment owners = userId and konnects
-      const pOwners = _.concat(userId, konnects)
+      // const pOwners = _.concat(userId, konnects)
         // comment recommendations ids and activity
       const pIds = _.concat(recommend, activity)
         // query to search for feed
+      // const feedQuery = {
+      //   or: [{
+      //     owner: pOwners
+      //   }, {
+      //     id: pIds
+      //   }]
+      // }
       const feedQuery = {
-        or: [{
-          owner: pOwners
-        }, {
-          id: pIds
-        }]
+        id: pIds
       }
       return feedQuery
     })(this.app)

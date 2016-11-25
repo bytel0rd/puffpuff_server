@@ -27,9 +27,10 @@ module.exports = class GeneralService extends Service {
    */
   formatResp(req, item) {
     const data = {}
-    data['skip'] = req.query.skip || this.config.generic.paginate.skip
-    data['limit'] = req.query.limit || this.config.generic.paginate.limit
     data['data'] = item
+    if (!req.query) req.query = {}
+    data['skip'] = req.query.skip || this.app.config.generic.paginate.skip
+    data['limit'] = req.query.limit || this.app.config.generic.paginate.limit
     return data
   }
 

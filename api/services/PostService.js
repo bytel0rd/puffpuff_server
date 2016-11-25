@@ -2,10 +2,11 @@
 
 const Service = require('trails-service')
 const FLOUR = 'Flour'
-/**
- * @module PostService
- * @description TODO document Service
- */
+const TYPE = '[post]'
+  /**
+   * @module PostService
+   * @description TODO document Service
+   */
 module.exports = class PostService extends Service {
 
   /**
@@ -14,7 +15,8 @@ module.exports = class PostService extends Service {
    * passed.
    */
   sanitize(model) {
-    if (!model.title || !model.body || !model.category) return true
+    // !model.title ||
+    if (!model.body) return true
     return false
   }
 
@@ -22,13 +24,15 @@ module.exports = class PostService extends Service {
    * setProp(req, res, model)
    * returns the model with added properties
    */
-  setProp(req, res, model){
+  setProp(req, res, model) {
     if (!req.isAuthenticated()) {
-      res.status(401).json({mgs: 'unathorized access please login'})
+      res.status(401).json({
+        mgs: 'unathorized access please login'
+      })
       return undefined
     }
     model['owner'] = req.user.id
-    model['isPost'] = true
+    model['type'] = TYPE
     return model
   }
 
@@ -39,8 +43,7 @@ module.exports = class PostService extends Service {
    * parameters
    */
   create(req, res) {
-    const done = this.app.services.GeneralService.done
-    this.app.services.OrmService.create(req, res, FLOUR, this.sanitize, this.setProp, done)
+    this.app.services.OrmService.create(req, res, FLOUR, this.sanitize, this.setProp, this.done)
   }
 
   /**
@@ -52,7 +55,16 @@ module.exports = class PostService extends Service {
    * search query can contain {title, category, owner}
    */
   find(req, res) {
-    this.app.services.OrmService.find(req, res, FLOUR)
+    this.app.services.OrmService.find(req, res, FLOUR, (query) => {
+      query.where.type = TYPE
+      const search = this.app.orm[FLOUR].find(query)
+        .populate('owner')
+        .populate('base')
+      return {
+        query: search,
+        countQuery: query
+      }
+    })
   }
 
   /**
@@ -62,7 +74,12 @@ module.exports = class PostService extends Service {
    * parameters
    */
   findOne(req, res) {
-    this.app.services.OrmService.findOne(req, res, FLOUR)
+    this.app.services.OrmService.findOne(req, res, FLOUR, (query) => {
+      query.type = TYPE
+      return this.app.orm[FLOUR].findOne(query)
+        .populate('owner')
+        .populate('base')
+    })
   }
 
   /**
@@ -74,6 +91,10 @@ module.exports = class PostService extends Service {
   update(req, res) {
     const done = this.app.services.GeneralService.done
     this.app.services.OrmService.update(req, res, FLOUR, this.sanitize, done)
+  }
+
+  done(data) {
+    this.app.services.RaccoonService.likeAction(data.owner, data.id)
   }
 
 }

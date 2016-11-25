@@ -37,18 +37,17 @@ module.exports = {
     dev: {
       adapter: require('sails-disk'),
       migrate: 'alter'
+    },
+
+    stage: {
+      adapter: require('sails-mongo'),
+      migrate: 'alter'
     }
-    // ,
-    //
-    // stage: {
-    //   adapter: require('sails-mongo'),
-    //   migrate: 'alter'
-    // }
 
   },
 
   models: {
-    defaultStore: 'dev',
+    defaultStore: 'stage',
     migrate: 'alter'
   }
 }

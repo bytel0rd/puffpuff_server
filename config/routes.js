@@ -47,6 +47,12 @@ module.exports = [
   },
 
   {
+    method: ['GET'],
+    path: '/api/v1/stream',
+    handler: 'HavenController.stream'
+  },
+
+  {
     method: ['GET', 'POST'],
     path: '/api/v1/posts',
     handler: 'PostController.base'
@@ -86,5 +92,30 @@ module.exports = [
     method: ['GET', 'PUT'],
     path: '/api/v1/iaction/{id}',
     handler: 'IActionController.params'
+  },
+
+  {
+    method: ['GET', 'PUT'],
+    path: '/api/v1/dashboard',
+    handler: 'UserController.currentUser'
+  },
+
+  {
+    method: ['POST'],
+    path: '/auth/login',
+    handler: 'UserController.login'
+  },
+
+  {
+    method: ['POST'],
+    path: '/auth/signUp',
+    handler: 'UserController.signUp'
   }
+  // ,
+  //
+  // {
+  //   method: ['GET'],
+  //   path: '/{id}',
+  //   handler: 'UserController.params'
+  // }
 ]

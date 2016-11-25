@@ -2,6 +2,7 @@
 
 const Service = require('trails-service')
 const FLOUR = 'Flour'
+const TYPE = '[comment]'
 
 /**
  * @module CommentService
@@ -14,7 +15,7 @@ module.exports = class CommentService extends Service {
    * passed.
    */
   sanitize(model) {
-    if (!model.base || !model.body || !model.owner) return true
+    if (!model.base || !model.body) return true
     return false
   }
 
@@ -30,7 +31,7 @@ module.exports = class CommentService extends Service {
       return undefined
     }
     model['owner'] = req.user.id
-    model['isPost'] = true
+    model['type'] = TYPE
     return model
   }
 
@@ -41,8 +42,7 @@ module.exports = class CommentService extends Service {
    * parameters
    */
   create(req, res) {
-    const done = this.app.services.GeneralService.done
-    this.app.services.OrmService.create(req, res, FLOUR, this.sanitize, this.setProp, done)
+    this.app.services.OrmService.create(req, res, FLOUR, this.sanitize, this.setProp, this.done)
   }
 
   /**
@@ -52,7 +52,16 @@ module.exports = class CommentService extends Service {
    * parameters
    */
   find(req, res) {
-    this.app.services.OrmService.find(req, res, FLOUR)
+    this.app.services.OrmService.find(req, res, FLOUR, (query) => {
+      query.where.type = TYPE
+      const search = this.app.orm[FLOUR].find(query)
+        .populate('owner')
+        .populate('base')
+      return {
+        query: search,
+        countQuery: query
+      }
+    })
   }
 
   /**
@@ -62,7 +71,12 @@ module.exports = class CommentService extends Service {
    * parameters
    */
   findOne(req, res) {
-    this.app.services.OrmService.findOne(req, res, FLOUR)
+    this.app.services.OrmService.findOne(req, res, FLOUR, (query) => {
+      query.type = TYPE
+      return this.app.orm[FLOUR].findOne(query)
+        .populate('owner')
+        .populate('base')
+    })
   }
 
   /**
@@ -74,6 +88,10 @@ module.exports = class CommentService extends Service {
   update(req, res) {
     const done = this.app.services.GeneralService.done
     this.app.services.OrmService.find(req, res, FLOUR, this.sanitize, done)
+  }
+
+  done( data) {
+    this.app.services.RaccoonService.likeAction(data.owner, data.id)
   }
 
 }

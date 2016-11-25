@@ -13,11 +13,21 @@
 'use strict'
 
 module.exports = {
-
-  FootprintController: ['Passport.jwt'],
-
+  // FootprintController: ['Passport.jwt'],
+  'CommentController': ['Auth.allowOnlyGet'],
+  'PostController': ['Auth.allowOnlyGet'],
+  'HavenController': {
+    feedBase: ['Passport.jwt']
+  },
   DefaultController: {
-    info: ['Auth.allowOnlyGet'],
-    test: ['Passport.jwt']
+    info: ['Auth.loginUser']
+      // ,
+      // test: ['Passport.jwt']
+  },
+
+  UserController: {
+    login: ['Auth.loginUser'],
+    signUp: ['Auth.signUpUser'],
+    currentUser: ['Passport.jwt']
   }
 }

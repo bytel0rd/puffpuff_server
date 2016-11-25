@@ -31,7 +31,7 @@ module.exports = class OrmService extends Service {
     if (arguments.length > 4) {
       if (sanitize(model)) {
         return res.status(400).json({
-          mgs: 'invalid request parameters'
+          mgs: 'invalid request parameters during santization'
         })
       }
     }
@@ -40,10 +40,11 @@ module.exports = class OrmService extends Service {
     if (arguments.length === 6) {
       model = setProp(req, res, model)
       if (!model) return res.status(400).json({
-        mgs: 'invalid parameters provided'
+        mgs: 'invalid parameters provided to set object model'
       })
     }
 
+    console.log(model);
     Orm.create(model)
       .then((data) => {
         // finally the done fuction is called on the data before response
@@ -52,7 +53,7 @@ module.exports = class OrmService extends Service {
       })
       .catch((err) => {
         res.status(409).json({
-          mgs: 'error during post creation'
+          mgs: 'error during  creation', err
         })
       })
   }
@@ -71,20 +72,22 @@ module.exports = class OrmService extends Service {
     const pageOpts =  this.app.config.generic.paginate
     const model = this.app.services.GeneralService.model(req)
     // retrives sanitized query for count query
-    const countQuery = paginate.countQuery(model)
+    let countQuery = paginate.countQuery(model)
     // retrives sanitized query for find query
     const findQuery = paginate.mapModel(model, paginate.creteria())
     // sets query Limt
     findQuery['limit'] = findQuery.limit || pageOpts.limit
     //  sets query skip
     findQuery['skip'] = findQuery.skip || pageOpts.skip
-
     // generator function to accumulate the count , data, limit and skip
     co(function* () {
       const result = {}
       // collate data
       let query = Orm.find(findQuery)
-      if (tquery) query =  tquery(findQuery)
+      if (tquery) {
+        query =  tquery(findQuery).query
+        countQuery = tquery(findQuery).countQuery
+      }
       // retrive find has data
       result['data'] = yield query
       // retrive count
@@ -115,7 +118,7 @@ module.exports = class OrmService extends Service {
       id: req.params.id
     }
     let query = Orm.findOne(dbquery)
-    if (tquery) query =  tquery(query)
+    if (tquery) query =  tquery(dbquery)
     query
       .then((orm) => res.status(200).json(orm))
       .catch((err) => res.status(409).json({

@@ -33,4 +33,24 @@ module.exports = class HavenController extends Controller{
   trends(req, res){
     return this.app.services.HavenService.trendingApi(req, res)
   }
+
+  /**
+   * stream(req, res)
+   * loads the latest feed items from the database
+   */
+  stream(req, res){
+    const pageOpts =  this.app.config.generic.paginate
+    const limit = req.query.limit || pageOpts.limit
+    const skip = req.query.skip || pageOpts.skip
+    this.app.services.OrmService.find(req, res, 'Flour', (query)=> {
+      const countQuery = {where: {}}
+      query = this.app.orm.Flour.find({where: countQuery, limit, skip, sort: 'createdAt DESC'})
+        .populate('owner')
+        .populate('base')
+      return {
+        countQuery,
+        query
+      }
+    })
+  }
 }
