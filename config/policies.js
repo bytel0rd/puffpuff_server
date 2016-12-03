@@ -15,7 +15,7 @@
 module.exports = {
   // FootprintController: ['Passport.jwt'],
   'CommentController': ['Auth.allowOnlyGet'],
-  'PostController': ['Auth.allowOnlyGet'],
+  'PostController': ['Upload.multipleUpload', 'Auth.allowOnlyGet'],
   'HavenController': {
     feedBase: ['Passport.jwt']
   },
@@ -24,7 +24,11 @@ module.exports = {
       // ,
       // test: ['Passport.jwt']
   },
-
+  IActionController: {
+    info: ['Auth.allowOnlyGet'],
+    base: ['Auth.allowOnlyGet'],
+    params: ['Auth.allowOnlyGet']
+  },
   UserController: {
     login: ['Auth.loginUser'],
     signUp: ['Auth.signUpUser'],

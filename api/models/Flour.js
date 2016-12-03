@@ -15,7 +15,9 @@ module.exports = class Flour extends Model {
     return {
       title: {type: 'string'},
       body: {type: 'string', required: true},
-      imgsUrl: {type: 'array'},
+      imgsUrl: {
+        model: 'Image'
+      },
       base: {
         model: 'Flour'
       },

@@ -25,9 +25,10 @@ module.exports = class GeneralService extends Service {
    * used formating item to contain limit and skip params
    * by assigning default params to undefined paramters
    */
-  formatResp(req, item) {
+  formatResp(req, item, total) {
     const data = {}
     data['data'] = item
+    data['total'] = total || 0
     if (!req.query) req.query = {}
     data['skip'] = req.query.skip || this.app.config.generic.paginate.skip
     data['limit'] = req.query.limit || this.app.config.generic.paginate.limit

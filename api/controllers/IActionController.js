@@ -38,6 +38,6 @@ module.exports = class IActionController extends Controller{
    * interaction for  an id with the users interaction on the id
    */
   info(req, res){
-    return this.app.services.ActionService.info(req, res)
+    return this.app.services.ActionService.infoApi(req, res)
   }
 }

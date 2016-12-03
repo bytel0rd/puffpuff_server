@@ -28,6 +28,9 @@ module.exports = class User extends Model {
         min: 5,
         max: 15,
         required: true
+      },
+      imgsUrl: {
+        model: 'Image'
       }
       // ,
       // surname: {

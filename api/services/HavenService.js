@@ -48,24 +48,15 @@ module.exports = class HavenService extends Service {
    * retuns a list of public trending posts or comments
    */
   trendingApi(req, res) {
-    return co.wrap(function*(base) {
-      // return if there is skip and limit in the query
-      if (req.query.skip && req.query.limit) {
-        return yield base.trending(req.query.limit, req.query.skip)
-      }
-      // return if there is no skip but there is limit
-      if (!req.query.skip && req.query.limit) {
-        return yield base.trending(base.config.generic.paginate.limit, req.query.skip)
-      }
-      // return if there is no limit but there is skip
-      if (!req.query.limit && req.query.skip) {
-        return yield base.trending(req.query.limit, base.config.generic.paginate.skip)
-      }
-      // return if there is no skip but there is no limit
-      return yield base.trending()
-    })(this).then((trends) => {
-      res.status(200).json(this.app.services.GeneralService.formatResp(req, trends))
-    }).catch( (err) => res.status(400).json(err))
+    return co.wrap(function*(base, local) {
+      return yield local.trending(req.query.skip,  req.query.limit)
+    })(this.app, this).then((data) => {
+      res.status(200).json(this.app.services.GeneralService.formatResp(req,
+        data.trending, data.count))
+    }).catch( (err) => {
+      console.log('trends',err)
+      res.status(400).json(err)
+    })
   }
 
   /**
@@ -209,9 +200,14 @@ module.exports = class HavenService extends Service {
    * trending(limit, skip [, callback])
    */
   trending(limit, skip, callback) {
+    console.log(limit, skip)
+    limit = _.parseInt(limit)
+    skip =  _.parseInt(skip)
+    console.log(limit, skip)
     // takes the last argument has the callback
-    if (arguments.length < 3) arguments[arguments.length - 1] = callback
+    if (arguments.length === 3) arguments[arguments.length - 1] = callback
     return co.wrap(function*(app, tquery) {
+      console.log(limit, skip)
       // cross check the type of params before using
       if (typeof skip !== 'number') skip = app.config.generic.paginate.skip
       if (typeof limit !== 'number') limit = app.config.generic.paginate.limit
@@ -223,11 +219,14 @@ module.exports = class HavenService extends Service {
         skip,
         limit,
         sort: 'createdAt DESC'
-      })
+      }).populate('owner').populate('base').populate('imgsUrl')
       // executes callback if its a function
       if (typeof callback === 'function') callback(trending)
       // returns promised trendings
-      return trending
+      const count = yield app.orm[Flour].count(tquery)
+      return {
+        trending,
+        count }
     })(this.app, this.trendingQuery)
   }
 }

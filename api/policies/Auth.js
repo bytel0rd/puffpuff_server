@@ -13,8 +13,6 @@ module.exports = class AuthPolicy extends Policy {
    * only allows get for unAuthorized users
    */
   allowOnlyGet(req, res, next) {
-    console.log(req.body, req.user, req.method)
-
     return (req.method === 'GET') ? next() : this.app.policies.Passport.jwt(req, res, next)
   }
 
@@ -24,6 +22,11 @@ module.exports = class AuthPolicy extends Policy {
     })
   }
 
+  ifToken(req, res, next){
+    if (req.query === undefined || req.query.token === undefined ||
+      req.query.token === '' || req.query.token === 'undefined') return next()
+    return this.app.policies.Passport.jwt(req, res, next)
+  }
   /**
    * loginUser(req, res, next)
    * uses passport-jwt for user login

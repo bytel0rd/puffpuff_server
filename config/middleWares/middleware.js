@@ -1,12 +1,7 @@
 const bodyParser = require('body-Parser')
 const middlewares = {}
-
-// const session = require('express-session')
-// const MongoDBStore = require('connect-mongodb-session')(session)
-// const store = new MongoDBStore({
-//   uri: 'mongodb://localhost:27017/sails',
-//   collection: 'mySessions'
-// })
+const _ = require('lodash')
+const path = require('path')
 
 //middlewares loading order
 middlewares.order = [
@@ -21,6 +16,7 @@ middlewares.order = [
   'methodOverride',
   'www',
   'router',
+  'images',
   '404',
   '500'
 ]
@@ -34,9 +30,14 @@ middlewares.bodyParser = [
   })
 ]
 
-// middlewares.session = function (req, res, next) {
-//
-// }
+middlewares.images = function (req, res, next) {
+  const url = req.url
+  if (url.indexOf('public')  === -1) return next()
+  const fileUrl =   path.resolve(__dirname, './../../public' +  _.replace(url, '/public', ''))
+  res.sendFile(fileUrl)
+}
+
+// middlewares.www = express.static('./../../www')
 
 middlewares.preflight = function(req, res, next) {
   // console.log(req.method, req.headers.origin, req.url)

@@ -59,6 +59,7 @@ module.exports = class PostService extends Service {
       query.where.type = TYPE
       const search = this.app.orm[FLOUR].find(query)
         .populate('owner')
+        .populate('imgsUrl')
         .populate('base')
       return {
         query: search,
@@ -79,6 +80,7 @@ module.exports = class PostService extends Service {
       return this.app.orm[FLOUR].findOne(query)
         .populate('owner')
         .populate('base')
+        .populate('imgsUrl')
     })
   }
 
@@ -94,7 +96,8 @@ module.exports = class PostService extends Service {
   }
 
   done(data) {
-    this.app.services.RaccoonService.likeAction(data.owner, data.id)
+    this.app.services.RaccoonService.likeAction(data.owner, data.id, (data) => {
+    })
   }
 
 }

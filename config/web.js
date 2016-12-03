@@ -62,15 +62,13 @@ module.exports = {
   /**
    * Alternate method to add multiple template engine, for single view template use config.views.engine
    */
-  /*
-  views: {
-    engines: {
-      // html: require('some-view-engine')
-    },
-    path: 'views'
-  },
-  */
 
+  // views: {
+  //   engines: {
+      // html: require('some-view-engine')
+  //   },
+  //   path: 'views'
+  // }
   /**
    * SSL options
    * Cert and key or pfx to create HTTPS server

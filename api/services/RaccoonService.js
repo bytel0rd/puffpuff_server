@@ -10,6 +10,10 @@ const raccoon = require('raccoon')
    */
 module.exports = class RaccoonService extends Service {
 
+  constructor(app){
+    super(app)
+    this.init()
+  }
   /**
    * init()
    * instanate raccoon connection to redis
@@ -32,10 +36,12 @@ module.exports = class RaccoonService extends Service {
    */
   likeAction(userId, itemId, callback) {
     return new Promise((resolve, reject) => {
+      'there'
       if (callback) return this.raccoon.liked(userId, itemId, (result) => {
         if (typeof callback === 'function') callback(result)
         return resolve(result)
       })
+      'here'
       return resolve(this.raccoon.liked(userId, itemId))
     })
   }

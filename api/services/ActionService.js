@@ -26,7 +26,7 @@ module.exports = class ActionService extends Service {
    * of the newly created action back to the user.
    */
   create(req, res) {
-    let model = this.app.services.OrmService.model(req)
+    let model = this.app.services.GeneralService.model(req)
     const Action = this.app.orm.Action
     const creator = this.app.services.OrmService.create
     const done = this.app.services.GeneralService.done
@@ -43,13 +43,21 @@ module.exports = class ActionService extends Service {
       })
     }
     if (model.type === 'view' && model.owner === 'guest') {
-      return creator(req, res, ACTION, this.sanitize, this.setProp)
+      return creator(req, res, ACTION, this.santize, this.setProp)
     }
     return Action.findOne(model)
       .then((data) => {
-        if (data !== {}) return res.status(200).json(data)
-        return creator(req, res, ACTION, this.sanitize, this.setProp, done)
+        console.log(data );
+        if (data === undefined || data === {}) return this.genericAction(req, res, 'create', model)
+        if (data !== {} ) return res.status(200).json(data)
       })
+  }
+
+  genericAction(req, res, oper, model) {
+    const Action = this.app.orm.Action
+    return Action[oper](model)
+      .then( (data) => res.status(200).json(data))
+      .catch( (err) => res.status(400).json(err))
   }
 
   /**
@@ -80,6 +88,17 @@ module.exports = class ActionService extends Service {
     return this.app.services.OrmService.update(req, res, ACTION, this.sanitize, this.setProp, done)
   }
 
+  infoApi(req, res){
+    let userId = ''
+    if (req.user !== undefined) userId =  req.user.id
+    return this.info(req.params.id, req.isAuthenticated(), userId)
+    .then( (result) => {
+      res.status(200).json(result)
+    }).catch( (err) => {
+      res.status(500).json(err)
+    })
+  }
+
   /**
    * ActionService
    * Infos(req, res)
@@ -89,32 +108,31 @@ module.exports = class ActionService extends Service {
    * this particular method creates a chain reaction that calculates the
    * total action info which include {likes, dislikes, views, bias }
    */
-  info(req, res) {
+  info(id, authenticated, userId) {
     const Action = this.app.orm.Action
-    const id = req.params.id
 
-    co(function*() {
+    return co.wrap(function*(app) {
       const result = {}
 
       // gets the total number of likes of infos
-      result['likes'] = yield this.app.services.RaccoonService.likedCount(id)
+      result['likes'] = yield app.services.RaccoonService.likedCount(id)
       // gets the total number of items dislikes
-      result['dislikes'] = yield this.app.services.RaccoonService.dislikedCount(id)
+      result['dislikes'] = yield app.services.RaccoonService.dislikedCount(id)
       // gets the total amount of views the item has
-      result['views'] = yield this.app.orm[Action].count({
-        id: req.params.id,
+      result['views'] = yield Action.count({
+        id,
         type: 'view'
       })
 
       // if authorized get the user bias
-      if (!req.isAuthenticated()) return result
+      if (!authenticated) return result
 
       // map query to search for the latest user bias for like or dislike
       const query = {}
-      query.owner = req.user.id
+      query.owner = userId
       query.type = ['like', 'dislike']
 
-      const bias = this.app.orm[Action].findOne(query)
+      const bias = app.orm[Action].findOne(query)
         // map bias to result
       if (bias.type === 'like') {
         result['bais'] = true
@@ -125,11 +143,7 @@ module.exports = class ActionService extends Service {
       }
 
       return result
-    }).then( (result) => {
-      res.status(200).json(result)
-    }).catch( (err) => {
-      res.status(500).json(err)
-    })
+    })(this.app)
 
   }
 
