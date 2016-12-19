@@ -57,6 +57,7 @@ module.exports = class CommentService extends Service {
       const search = this.app.orm[FLOUR].find(query)
         .populate('owner')
         .populate('base')
+        .populate('imgsUrl')
       return {
         query: search,
         countQuery: query
@@ -76,6 +77,7 @@ module.exports = class CommentService extends Service {
       return this.app.orm[FLOUR].findOne(query)
         .populate('owner')
         .populate('base')
+        .populate('imgsUrl')
     })
   }
 
@@ -90,8 +92,24 @@ module.exports = class CommentService extends Service {
     this.app.services.OrmService.find(req, res, FLOUR, this.sanitize, done)
   }
 
+  /**
+   * [done description] contains callback with created data
+   * @param  {[type]}   data [description]
+   * @return {Function}      [description]
+   */
   done( data) {
-    this.app.services.RaccoonService.likeAction(data.owner, data.id)
+    // link to raccon for recommendation
+    this.app.services.RaccoonService.likeAction(data.owner, data.id, ()=>{})
+
+    // populate and serach since create and update doesn't
+    // and emits it back to the room
+    this.app.orm[FLOUR].findOne({id: data.id})
+      .populate('owner')
+      .populate('base')
+      .populate('imgsUrl')
+      .then( (data) => this.app.services.IRealtimeService.roomEmit(data))
+    // emits it back for the stream
+    this.app.services.IRealtimeService.stream(data)
   }
 
 }

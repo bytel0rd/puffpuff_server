@@ -7,6 +7,8 @@
  * @see {@link http://trailsjs.io/doc/config/database}
  */
 
+const MONGODB_URL = process.env.MONGODB_URL || 'mongodb://localhost:27017/sails'
+
 'use strict'
 
 module.exports = {
@@ -41,7 +43,8 @@ module.exports = {
 
     stage: {
       adapter: require('sails-mongo'),
-      migrate: 'alter'
+      migrate: 'alter',
+      url: MONGODB_URL
     }
 
   },

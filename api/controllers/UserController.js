@@ -5,7 +5,6 @@ const Controller = require('trails-controller')
 module.exports = class UserController extends Controller {
 
   currentUser(req, res){
-    console.log('got here');
     const flux = this.app.services.FluxService
     if (req.method === 'PUT') {
       return flux.updateCurrentUser(req, res)

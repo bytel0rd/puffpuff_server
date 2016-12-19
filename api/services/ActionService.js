@@ -29,7 +29,6 @@ module.exports = class ActionService extends Service {
     let model = this.app.services.GeneralService.model(req)
     const Action = this.app.orm.Action
     const creator = this.app.services.OrmService.create
-    const done = this.app.services.GeneralService.done
 
     if (!this.santize(model)) {
       return res.status(400).json({
@@ -45,20 +44,32 @@ module.exports = class ActionService extends Service {
     if (model.type === 'view' && model.owner === 'guest') {
       return creator(req, res, ACTION, this.santize, this.setProp)
     }
-    return Action.findOne(model)
+    return Action.findOne({
+      owner: model.owner,
+      type: ['like', 'dislike'],
+      flour: model.flour
+    })
       .then((data) => {
-        console.log(data );
         if (data === undefined || data === {}) return this.genericAction(req, res, 'create', model)
+        if (model.type !== data.type
+          && model.owner === data.owner) return this.genericAction(req,res,'update', model, data )
         if (data !== {} ) return res.status(200).json(data)
       })
   }
 
-  genericAction(req, res, oper, model) {
+  genericAction(req, res, oper, model, crietria) {
     const Action = this.app.orm.Action
-    return Action[oper](model)
-      .then( (data) => res.status(200).json(data))
+    let query = Action[oper](model)
+    if (oper === 'update') {
+      query = Action.update(crietria, { type: model.type })
+    }
+    return query
+      .then((data) => {
+        res.status(200).json(data)
+      })
       .catch( (err) => res.status(400).json(err))
   }
+
 
   /**
    * find(req, res)
@@ -92,11 +103,11 @@ module.exports = class ActionService extends Service {
     let userId = ''
     if (req.user !== undefined) userId =  req.user.id
     return this.info(req.params.id, req.isAuthenticated(), userId)
-    .then( (result) => {
-      res.status(200).json(result)
-    }).catch( (err) => {
-      res.status(500).json(err)
-    })
+      .then((result) => {
+        res.status(200).json(result)
+      }).catch( (err) => {
+        res.status(500).json(err)
+      })
   }
 
   /**
@@ -110,14 +121,15 @@ module.exports = class ActionService extends Service {
    */
   info(id, authenticated, userId) {
     const Action = this.app.orm.Action
-
+    const likes = 'like'
+    const dislikes = 'dislike'
     return co.wrap(function*(app) {
       const result = {}
 
-      // gets the total number of likes of infos
-      result['likes'] = yield app.services.RaccoonService.likedCount(id)
-      // gets the total number of items dislikes
-      result['dislikes'] = yield app.services.RaccoonService.dislikedCount(id)
+      // gets the total number of likes of infos app.services.RaccoonService.likedCount(id)
+      result['likes'] = yield Action.count({ type: likes, flour: id })
+      // gets the total number of items dislikes app.services.RaccoonService.dislikedCount(id)
+      result['dislikes'] = yield Action.count({type: dislikes, flour: id})
       // gets the total amount of views the item has
       result['views'] = yield Action.count({
         id,

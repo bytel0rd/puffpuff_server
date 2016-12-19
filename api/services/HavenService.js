@@ -4,7 +4,7 @@ const Service = require('trails-service')
 const co = require('co')
 const _ = require('lodash')
 const moment = require('moment-timezone')
-// const Connect = 'Connect'
+  // const Connect = 'Connect'
 const Flour = 'Flour'
   /**
    * @module HavenService
@@ -19,28 +19,18 @@ module.exports = class HavenService extends Service {
    */
   feedApi(req, res, userId) {
     return co.wrap(function*(base) {
-      // return if there is skip and limit in the query
-      if (req.query.skip && req.query.limit) {
-        return yield base.feed(userId, req.query.limit, req.query.skip)
-      }
-      // return if there is no skip but there is limit
-      if (!req.query.skip && req.query.limit) {
-        return yield base.feed(userId, base.config.generic.paginate.limit, req.query.skip)
-      }
-      // return if there is no limit but there is skip
-      if (!req.query.limit && req.query.skip) {
-        return yield base.feed(userId, req.query.limit, base.config.generic.paginate.skip)
-      }
-      // return if there is no skip but there is no limit
-      return yield base.trending(userId)
+      return yield base.feed(userId, req.query.limit, req.query.skip)
     })(this).then((feed) => {
       // gets formated data
-      const data = this.app.services.GeneralService.formatResp(req, feed)
-      // adds the userId to the formated data
+      const data = this.app.services.GeneralService.formatResp(req, feed.item, feed.total)
+        // adds the userId to the formated data
       data['userId'] = userId
-      // return the formated data
+        // return the formated data
       return res.status(200).json(data)
-    }).catch( (err) => res.status(400).json(err))
+    }).catch((err) => {
+      this.app.info(err)
+      res.status(400).json(err)
+    })
   }
 
   /**
@@ -49,12 +39,12 @@ module.exports = class HavenService extends Service {
    */
   trendingApi(req, res) {
     return co.wrap(function*(base, local) {
-      return yield local.trending(req.query.skip,  req.query.limit)
+      return yield local.trending(req.query.limit, req.query.skip)
     })(this.app, this).then((data) => {
       res.status(200).json(this.app.services.GeneralService.formatResp(req,
         data.trending, data.count))
-    }).catch( (err) => {
-      console.log('trends',err)
+    }).catch((err) => {
+      this.app.info(err)
       res.status(400).json(err)
     })
   }
@@ -86,23 +76,23 @@ module.exports = class HavenService extends Service {
         // gets all user activities
       const activity = yield raccoon.allWatchedFor(userId)
         // gets all konnects ids for relative coments
-      // const konnects = _.map(yield app.orm[Connect].find(konnectQuery), (Konnect) => {
-      //   if (Konnect.owner === userId) return Konnect.accepted
-      //   return Konnect.owner
-      // })
+        // const konnects = _.map(yield app.orm[Connect].find(konnectQuery), (Konnect) => {
+        //   if (Konnect.owner === userId) return Konnect.accepted
+        //   return Konnect.owner
+        // })
 
       // comment owners = userId and konnects
       // const pOwners = _.concat(userId, konnects)
-        // comment recommendations ids and activity
+      // comment recommendations ids and activity
       const pIds = _.concat(recommend, activity)
         // query to search for feed
-      // const feedQuery = {
-      //   or: [{
-      //     owner: pOwners
-      //   }, {
-      //     id: pIds
-      //   }]
-      // }
+        // const feedQuery = {
+        //   or: [{
+        //     owner: pOwners
+        //   }, {
+        //     id: pIds
+        //   }]
+        // }
       const feedQuery = {
         id: pIds
       }
@@ -119,15 +109,22 @@ module.exports = class HavenService extends Service {
     return co.wrap(function*(app, feedQuerys) {
       // gets the feedQuery for user
       const feedQuery = yield feedQuerys(userId)
-      // assign default for undefined paramters
+        // assign default for undefined paramters
       if (!limit) limit = app.config.generic.paginate.limit
       if (!skip) skip = app.config.generic.paginate.skip
-      // returns the personalized userId feed
-      return yield app.orm[Flour].find({
+        // returns the personalized userId feed
+
+      const item = yield app.orm[Flour].find({
         where: feedQuery,
         limit,
         skip,
         sort: 'createdAt DESC'
+      }).populate('owner').populate('base').populate('imgsUrl')
+
+      const total = yield app.orm[Flour].count(feedQuery)
+      return Promise.resolve({
+        item,
+        total
       })
     })(this.app, this.feedQuery)
   }
@@ -144,7 +141,7 @@ module.exports = class HavenService extends Service {
       return yield app.orm[Flour].findOne({
         where: feedQuery,
         sort: 'createdAt DESC'
-      })
+      }).populate('owner').populate('base').populate('imgsUrl')
     })(this.app, this.feedQuery)
   }
 
@@ -177,11 +174,11 @@ module.exports = class HavenService extends Service {
     return co.wrap(function*(app) {
       // gets a list of best rated items
       const bestRated = yield app.services.RaccoonService.bestRated()
-      // maps dates to correct timezone
+        // maps dates to correct timezone
       const date = moment().format('YYYY-MM-DD')
       const dateBegin = moment(date).tz('Africa/Lagos').toISOString()
       const dateEnd = moment(date).tz('Africa/Lagos').add(1, 'days').toISOString()
-      // returns promised query
+        // returns promised query
       return {
         id: bestRated,
         createdAt: {
@@ -200,33 +197,31 @@ module.exports = class HavenService extends Service {
    * trending(limit, skip [, callback])
    */
   trending(limit, skip, callback) {
-    console.log(limit, skip)
     limit = _.parseInt(limit)
-    skip =  _.parseInt(skip)
-    console.log(limit, skip)
-    // takes the last argument has the callback
+    skip = _.parseInt(skip)
+      // takes the last argument has the callback
     if (arguments.length === 3) arguments[arguments.length - 1] = callback
     return co.wrap(function*(app, tquery) {
-      console.log(limit, skip)
       // cross check the type of params before using
       if (typeof skip !== 'number') skip = app.config.generic.paginate.skip
       if (typeof limit !== 'number') limit = app.config.generic.paginate.limit
-      // retrives the query to perform the db search
+        // retrives the query to perform the db search
       tquery = yield tquery()
-      // retrives the trends by mapping paramters
+        // retrives the trends by mapping paramters
       const trending = yield app.orm[Flour].find({
         where: tquery,
         skip,
         limit,
         sort: 'createdAt DESC'
       }).populate('owner').populate('base').populate('imgsUrl')
-      // executes callback if its a function
+        // executes callback if its a function
       if (typeof callback === 'function') callback(trending)
-      // returns promised trendings
+        // returns promised trendings
       const count = yield app.orm[Flour].count(tquery)
       return {
         trending,
-        count }
+        count
+      }
     })(this.app, this.trendingQuery)
   }
 }

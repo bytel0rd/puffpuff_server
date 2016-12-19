@@ -35,7 +35,10 @@ function resizeImg(inital, final , getInital){
 function pWrite(img, path){
   return new Promise( (resolve, reject) => {
     img.write(path, (err, data) => {
-      if (err) return reject(err)
+      if (err) {
+        this.app.warn(err)
+        return reject(err)
+      }
       return resolve(data)
     })
   })
@@ -49,19 +52,6 @@ module.exports = class UploadService extends Service {
 
   constructor(app) {
     super(app)
-    // initialize storage options for multer
-    // const storage = multer.diskStorage({
-    //   // contolls the destination for saving the file
-    //   destination: function(req, file, cb) {
-    //     console.log('file', file)
-    //     converter(file)
-    //     cb(null, './../../public')
-    //   },
-    //   // perform callback checks for file type
-    //   filename: function(req, file, cb) {
-    //     cb(null, file.fieldname + '-' + Date.now() + '-' + file.originalname)
-    //   }
-    // })
     const storage = multer.memoryStorage()
       // creates global accessible multer
     this.multer = multer({
@@ -84,7 +74,7 @@ module.exports = class UploadService extends Service {
     const name = data.originalname
     const img = data.buffer
     const size = data.size
-
+    const log = this.app.log
     return co.wrap(function*() {
       try {
         const data = {}
@@ -124,6 +114,7 @@ module.exports = class UploadService extends Service {
         return Promise.resolve(data)
       }
       catch (e) {
+        log.warn(e)
         return Promise.reject(e)
       }
 
@@ -137,6 +128,7 @@ module.exports = class UploadService extends Service {
    */
   saveImg(images) {
     const Image = this.app.orm.Image
+    const log = this.app.log
     return co.wrap(function*(converter) {
       try {
         const holder = []
@@ -152,6 +144,7 @@ module.exports = class UploadService extends Service {
         return Promise.resolve(yield Image.create({imgs: holder}))
       }
       catch (e) {
+        log.warn(e)
         return Promise.reject(e)
       }
     })(this.convertImg)

@@ -24,7 +24,7 @@ module.exports = class BootIActionService extends Service {
         for (let i = 0; i < actionList.length; i++) {
           const action = actionList[i]
           if (action.type === 'like') yield like(action.owner, action.flour, done)
-          if (action.type === 'dislike') yield dislike(action.owner, action.flour)
+          if (action.type === 'dislike') yield dislike(action.owner, action.flour, done)
           return Promise.resolve('successful linked Previous Actions')
         }
       }
@@ -32,7 +32,7 @@ module.exports = class BootIActionService extends Service {
         return Promise.reject(e)
       }
     })().then( (data) => this.app.log.info(data))
-    .catch( (err) => this.app.log.info(err))
+    .catch( (err) => this.app.log.error(err))
   }
 
 
@@ -54,7 +54,7 @@ module.exports = class BootIActionService extends Service {
         return Promise.reject(e)
       }
     })().then( (data) => this.app.log.info(data))
-    .catch( (err) => this.app.log.info(err))
+    .catch( (err) => this.app.log.error(err))
   }
 
 }

@@ -9,7 +9,6 @@ const Service = require('trails-service')
 module.exports = class FluxService extends Service {
 
   getCurrentUser(req, res){
-    console.log(req.isAuthenticated() ,req.user);
     return res.status(200).json(req.user)
   }
 

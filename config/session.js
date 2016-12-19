@@ -1,6 +1,6 @@
 'use strict'
 
-const session = require('express-session')
+// const session = require('express-session')
 // const MongoDBStore = require('connect-mongodb-session')(session)
 // const store = new MongoDBStore({
 //   uri: 'mongodb://localhost:27017/sails',

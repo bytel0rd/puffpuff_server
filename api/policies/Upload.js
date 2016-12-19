@@ -16,7 +16,10 @@ module.exports = class UploadPolicy extends Policy {
           req.body.imgsUrl = data.id
           return next()
         })
-        .catch((err) => res.status(400).json({mgs: 'error while uploading images'}))
+        .catch((err) => {
+          this.app.info(err)
+          res.status(400).json({mgs: 'error while uploading images'})
+        })
         // next()
     })
   }
@@ -30,6 +33,7 @@ module.exports = class UploadPolicy extends Policy {
       if (!req.files || req.files === {}) return next()
 
       if (typeof req.body.body === 'object') req.body.body = req.body.body[0]
+      if (typeof req.body.base === 'object') req.body.base = req.body.base[0]
 
       this.app.services.UploadService.saveImg(req.files)
         .then((data) => {
@@ -37,6 +41,7 @@ module.exports = class UploadPolicy extends Policy {
           return next()
         })
         .catch((err) => {
+          this.app.error(err)
           res.status(400).json({mgs: 'error while uploading images'})
         })
     })

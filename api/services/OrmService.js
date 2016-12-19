@@ -30,6 +30,7 @@ module.exports = class OrmService extends Service {
     // santize returns true if model validation fail but false otherwise
     if (arguments.length > 4) {
       if (sanitize(model)) {
+        this.app.log.info(model, 'santization')
         return res.status(400).json({
           mgs: 'invalid request parameters during santization'
         })
@@ -39,12 +40,12 @@ module.exports = class OrmService extends Service {
       // it is neccessary to check for undefined to avoid unneccersy execution.
     if (arguments.length === 6) {
       model = setProp(req, res, model)
-      if (!model) return res.status(400).json({
-        mgs: 'invalid parameters provided to set object model'
-      })
+      if (!model) {
+        this.app.log.info(model, 'setprop')
+        return res.status(400).json({
+          mgs: 'invalid parameters provided to set object model'
+        })}
     }
-
-    console.log(model);
     Orm.create(model)
       .then((data) => {
         // finally the done fuction is called on the data before response
@@ -52,6 +53,7 @@ module.exports = class OrmService extends Service {
         return res.status(200).json(data)
       })
       .catch((err) => {
+        this.app.log.info(err)
         res.status(409).json({
           mgs: 'error during  creation', err
         })
@@ -100,9 +102,12 @@ module.exports = class OrmService extends Service {
       return result
 
     }).then((result) => res.status(200).json(result))
-      .catch((err) => res.status(409).json({
-        mgs: 'invalid request parameters'
-      }))
+      .catch((err) => {
+        this.app.info(err)
+        res.status(409).json({
+          mgs: 'invalid request parameters'
+        })
+      })
   }
 
   /**
@@ -121,9 +126,12 @@ module.exports = class OrmService extends Service {
     if (tquery) query =  tquery(dbquery)
     query
       .then((orm) => res.status(200).json(orm))
-      .catch((err) => res.status(409).json({
-        mgs: 'invalid request parameters'
-      }))
+      .catch((err) => {
+        this.app.info(err)
+        res.status(409).json({
+          mgs: 'invalid request parameters'
+        })
+      })
   }
 
   /**
@@ -172,6 +180,7 @@ module.exports = class OrmService extends Service {
         return res.status(200).json(data)
       })
       .catch((err) => {
+        this.app.info(err)
         res.status(409).json({
           mgs: 'error during post creation'
         })

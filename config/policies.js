@@ -14,18 +14,16 @@
 
 module.exports = {
   // FootprintController: ['Passport.jwt'],
-  'CommentController': ['Auth.allowOnlyGet'],
+  'CommentController': ['Upload.multipleUpload', 'Auth.allowOnlyGet'],
   'PostController': ['Upload.multipleUpload', 'Auth.allowOnlyGet'],
   'HavenController': {
     feedBase: ['Passport.jwt']
   },
   DefaultController: {
     info: ['Auth.loginUser']
-      // ,
-      // test: ['Passport.jwt']
   },
   IActionController: {
-    info: ['Auth.allowOnlyGet'],
+    info: ['Auth.ifToken'],
     base: ['Auth.allowOnlyGet'],
     params: ['Auth.allowOnlyGet']
   },

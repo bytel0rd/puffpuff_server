@@ -1,12 +1,21 @@
 const RACCOON_PORT = process.env.RACCOON_PORT || 7777
 const RACCOON_HOST = process.env.RACCOON_HOST || '127.0.0.1'
-const RACCOON_AUTH = process.env.RACCOON_AUTH || {}
+const RACCOON_USERNAME = process.env.RACCOON_USERNAME || ''
+const RACCOON_PASSWORD = process.env.RACCOON_PASSWORD || ''
+
+const RACCOON_AUTH = {
+  username: RACCOON_USERNAME,
+  password: RACCOON_PASSWORD
+}
+
+const ORM_LIMIT = process.env.ORM_LIMIT || 5
+const ORM_SKIP = process.env.ORM_SKIP || 0
 
 module.exports = {
   // OrmService find pagination options
   paginate: {
-    limit: 5,
-    skip: 0
+    limit: ORM_LIMIT,
+    skip: ORM_SKIP
   },
 
   // raccoon configs for auth and config

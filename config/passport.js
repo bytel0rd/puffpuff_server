@@ -3,11 +3,11 @@
 const JwtStrategy = require('passport-jwt').Strategy
 const ExtractJwt = require('passport-jwt').ExtractJwt
 
-const EXPIRES_IN_SECONDS = 60 * 60 * 24
-const SECRET = process.env.tokenSecret || 'mysupersecuretoken'
-const ALGORITHM = 'HS256'
-const ISSUER = 'localhost'
-const AUDIENCE = 'localhost'
+const EXPIRES_IN_SECONDS = process.env.JWT_EXPIRES || 60 * 60 * 24
+const SECRET = process.env.JWT_SECRET || 'mysupersecuretoken'
+const ALGORITHM = process.env.JWT_ALGORITHM || 'HS256'
+const ISSUER =  process.env.JWT_ISSUER || 'localhost'
+const AUDIENCE =  process.env.JWT_AUDIENCE || 'localhost'
 
 module.exports = {
   redirect: {

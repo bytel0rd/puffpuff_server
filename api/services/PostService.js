@@ -95,9 +95,15 @@ module.exports = class PostService extends Service {
     this.app.services.OrmService.update(req, res, FLOUR, this.sanitize, done)
   }
 
+  /**
+   * [done description] contains callbacks for newly created data
+   * @param  {[type]}   data [description]
+   * @return {Function}      [description]
+   */
   done(data) {
-    this.app.services.RaccoonService.likeAction(data.owner, data.id, (data) => {
-    })
+    this.app.services.RaccoonService.likeAction(data.owner, data.id, (data) => {})
+    // emits it back for the stream
+    this.app.services.IRealtimeService.stream(data)
   }
 
 }

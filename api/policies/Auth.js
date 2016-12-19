@@ -22,10 +22,12 @@ module.exports = class AuthPolicy extends Policy {
     })
   }
 
-  ifToken(req, res, next){
-    if (req.query === undefined || req.query.token === undefined ||
-      req.query.token === '' || req.query.token === 'undefined') return next()
-    return this.app.policies.Passport.jwt(req, res, next)
+  ifToken(req, res, next) {
+    // console.log(req.query.token)
+    return next()
+    // if (req.query === undefined || req.query.token === undefined ||
+    //   req.query.token === '' || req.query.token === 'undefined') return next()
+    // return this.app.policies.Passport.jwt(req, res, next)
   }
   /**
    * loginUser(req, res, next)
