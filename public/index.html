@@ -1,54 +1,116 @@
-<html>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1.0, user-scalable=no"/>
+  <title>PuffPuff Developer Page</title>
 
-  <head>
-    <title>TrailsMail - New Message</title>
-    <link rel="stylesheet" href="http://yui.yahooapis.com/pure/0.6.0/pure-min.css">
-    <link rel="stylesheet" href="/main.css">
-  </head>
+  <!-- CSS  -->
+  <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+  <link href="public/assets/css/materialize.css" type="text/css" rel="stylesheet" media="screen,projection"/>
+  <link href="public/assets/css/style.css" type="text/css" rel="stylesheet" media="screen,projection"/>
+</head>
+<body>
+  <nav class="white" role="navigation">
+    <div class="nav-wrapper container">
+      <a id="logo-container" href="#" class="brand-logo">
+        <img src="public/assets/imgs/logo.png"  class="brand-logo" alt="">
+      </a>
+      <ul class="right hide-on-med-and-down">
+        <li><a href="#">Docs</a></li>
+      </ul>
 
-  <body>
+      <ul id="nav-mobile" class="side-nav">
+        <li><a href="#">Docs</a></li>
+      </ul>
+      <a href="#" data-activates="nav-mobile" class="button-collapse"><i class="material-icons">menu</i></a>
+    </div>
+  </nav>
 
-    <div class="header">
-      <div class="home-menu pure-menu pure-menu-horizontal pure-menu-fixed">
-        <a class="pure-menu-heading" href="/">TrailsMail</a>
+  <div id="index-banner" class="parallax-container">
+    <div class="section no-pad-bot">
+      <div class="container">
+        <br><br>
+        <h1 class="header center text-lighten-2 white-text">PuffPuff</h1>
+        <div class="row center">
+          <h5 class="header col s12 light">Tomorrow Belongs To Those Who Hear IT Coming</h5>
+        </div>
+        <div class="row center">
+          <a href="#" id="download-button" class="btn-large waves-effect waves-light teal lighten-1">Join The Meal</a>
+        </div>
+        <br><br>
+
       </div>
     </div>
+    <div class="parallax"><img src="public/assets/imgs/background1.jpg" alt="Unsplashed background img 1"></div>
+  </div>
 
-    <section class="pure-g content">
 
-        <div class="pure-u-1">
+  <div class="container">
+    <div class="section">
 
-          <div class="new-email card">
+      <!--   Icon Section   -->
+      <div class="row">
+        <div class="col s12 m4">
+          <div class="icon-block">
+            <h2 class="center brown-text"><i class="material-icons">flash_on</i></h2>
+            <h5 class="center">Speeds up development</h5>
 
-            <div class="card-header">
-              <h2>New Message</h2>
-            </div>
-
-            <div class="card-body">
-              <form class="pure-form pure-form-stacked" action="/message" method="post" enctype="multipart/form-data">
-                <fieldset>
-                  <label for="recipient">Recipient</label>
-                  <input name="recipient" id="recipient" type="email" placeholder="Email">
-
-                  <label for="subject">Subject Line</label>
-                  <input name="subject" id="subject" type="text" placeholder="Subject Line">
-
-                  <label for="message">Message</label>
-                  <textarea name="message" rows="5" cols="40" placeholder="Your message here"></textarea>
-
-                  <label for="subject">Attachment<label>
-                  <input name="file" type="file" placeholder="Password">
-                  <button class="pure-button pure-button-primary">Send</button>
-                </fieldset>
-              </form>
-            </div>
-
+            <p class="light">We are interested in providing fast realtime information and contents for you and incremental fast deployment of features for our platforms.</p>
           </div>
+        </div>
 
+        <div class="col s12 m4">
+          <div class="icon-block">
+            <h2 class="center brown-text"><i class="material-icons">group</i></h2>
+            <h5 class="center">User Experience Focused</h5>
+
+            <p class="light">We are interested in providing nice user experienc on our sites and mobile application to access nice and beautiful contents provided by our users</p>
+          </div>
+        </div>
+
+        <div class="col s12 m4">
+          <div class="icon-block">
+            <h2 class="center brown-text"><i class="material-icons">settings</i></h2>
+            <h5 class="center">Easy to work with</h5>
+
+            <p class="light">We are dedicated individuals trying make a difference in the world which are fun and easy to work with.
+            we interested in onboarding developers  either by making them or stealing them.... Learn and have fun with us... Join The Wining Team </p>
+          </div>
+        </div>
       </div>
 
-    </section>
+    </div>
+  </div>
+
+  <footer class="page-footer teal">
+    <div class="container">
+      <div class="row">
+        <div class="col l6 s12">
+          <h5 class="white-text">Company Bio</h5>
+          <p class="grey-text text-lighten-4">We are a team of college students working on this project like it's our full time job. Any amount would help support and continue development on this project and is greatly appreciated.</p>
+
+
+        </div>
+        <div class="col l6 s12" >
+          <h5 class="white-text" >Contact Us</h5>
+          <p class="left-align light white-text"> contact lead developer  OGUNDIJO Abiodun at  abiodunogundijo@gmail.com  via email or +2348149464288 </p>
+        </div>
+      </div>
+    </div>
+    <div class="footer-copyright">
+      <div class="container">
+      Made by <a class="brown-text text-lighten-3" href="http://materializecss.com">Materialize</a>
+      </div>
+    </div>
+  </footer>
+
+
+  <!--  Scripts-->
+  <!--<script src="https://code.jquery.com/jquery-2.1.1.min.js"></script>-->
+  <script src="public/assets/js/jquery.min.js"></script>
+  <script src="public/assets/js/materialize.js"></script>
+  <script src="public/assets/js/init.js"></script>
 
   </body>
-
 </html>

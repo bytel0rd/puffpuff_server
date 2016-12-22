@@ -1,6 +1,7 @@
 ## directories and files to ignore by Git
 node_modules
 .tmp
+.vscode
 coverage
 test.js
 public/images

@@ -738,7 +738,7 @@ definitions:
   user:
     type: object
     properties:
-      _id:
+      id:
         type: string
         description: Unique identifier representing a specific product for a given latitude & longitude. For example, uberX in San Francisco will have a different product_id than uberX in Los Angeles.
       email:
@@ -747,22 +747,14 @@ definitions:
       username:
         type: string
         description: Display name of product.
-      surname:
-        type: string
-        description: Capacity of product. For example, 4 people.
-      lastname:
-        type: string
-        description: Image URL representing the product.
       gender:
         type: string
       dob:
         type: string
-      activated:
-        type: boolean
   post:
     type: object
     properties:
-      _id:
+      id:
         type: string
         description: Unique identifier representing a specific product for a given latitude & longitude. For example, uberX in San Francisco will have a different product_id than uberX in Los Angeles.
       base:
@@ -824,7 +816,7 @@ definitions:
     properties:
       data:
         type: array
-        items: 
+        items:
           type: object
         description: Unique identifier representing a specific product for a given latitude & longitude. For example, uberX in San Francisco will have a different product_id than uberX in Los Angeles.
       skipped:
