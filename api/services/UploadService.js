@@ -4,6 +4,7 @@ const Service = require('trails-service')
 const multer = require('multer')
 const jimp = require('jimp')
 const co = require('co')
+const mkdirp = require('mkdirp')
 
 const MAX_IMG_HEIGHT = 720
 const MAX_IMG_WIDTH = 1280
@@ -22,7 +23,7 @@ const storagePath = '/public/images'
  * getInital is the original params to be calculated
  * returns the new proportion to scale the imagebeibg resize
  */
-function resizeImg(inital, final , getInital){
+function resizeImg(inital, final, getInital) {
   return getInital * (final / inital)
 }
 
@@ -32,8 +33,8 @@ function resizeImg(inital, final , getInital){
  * @param  {[type]} path [the location to write the image]
  * @return {[type]}      [promised resturn]
  */
-function pWrite(img, path){
-  return new Promise( (resolve, reject) => {
+function pWrite(img, path) {
+  return new Promise((resolve, reject) => {
     img.write(path, (err, data) => {
       if (err) {
         this.app.warn(err)
@@ -43,6 +44,15 @@ function pWrite(img, path){
     })
   })
 }
+
+/**
+ * createImgDir()
+ * responsible for creating img upload directories of various quality and types
+ */
+function createImgDir() {
+  ['/avatar', '/high', '/low'].forEach((e) => mkdirp.sync(__dirname + './../..' + storagePath + e))
+}
+createImgDir()
 
 /**
  * @module UploadService
@@ -75,10 +85,10 @@ module.exports = class UploadService extends Service {
     const img = data.buffer
     const size = data.size
     const log = this.app.log
-    return co.wrap(function*() {
+    return co.wrap(function* () {
       try {
         const data = {}
-        // sets original image size
+          // sets original image size
         data['size'] = size
           // reads the image
         const HighImg = yield jimp.read(img)
@@ -94,23 +104,23 @@ module.exports = class UploadService extends Service {
           lowImg.resize(FEED_IMG_WIDTH, resize)
         }
         if (HighImg.bitmap.height > MAX_IMG_HEIGHT) {
-          resize = resizeImg(HighImg.bitmap.height , MAX_IMG_HEIGHT, HighImg.bitmap.width)
+          resize = resizeImg(HighImg.bitmap.height, MAX_IMG_HEIGHT, HighImg.bitmap.width)
           HighImg.resize(resize, MAX_IMG_HEIGHT)
         }
         if (lowImg.bitmap.height > FEED_IMG_HEIGHT) {
-          resize = resizeImg(lowImg.bitmap.height , FEED_IMG_HEIGHT, lowImg.bitmap.width)
+          resize = resizeImg(lowImg.bitmap.height, FEED_IMG_HEIGHT, lowImg.bitmap.width)
           lowImg.resize(resize, FEED_IMG_HEIGHT)
         }
-          // creates an avater is it specified or allowed
+        // creates an avater is it specified or allowed
         if (avatar) {
           const avatar = HighImg.clone().resize(THUMBNAIL_WIDTH, this.jimp.Auto)
           data['avatar'] = '.' + storagePath + '/avatar/' + Date.now() + name
           yield pWrite(avatar, data.avatar)
         }
         data['high'] = storagePath + '/high/' + Date.now() + name
-        yield pWrite(HighImg,  '.' +  data.high)
+        yield pWrite(HighImg, '.' + data.high)
         data['low'] = storagePath + '/low/' + Date.now() + name
-        yield pWrite(lowImg,  '.' +  data.low)
+        yield pWrite(lowImg, '.' + data.low)
         return Promise.resolve(data)
       }
       catch (e) {
@@ -129,19 +139,23 @@ module.exports = class UploadService extends Service {
   saveImg(images) {
     const Image = this.app.orm.Image
     const log = this.app.log
-    return co.wrap(function*(converter) {
+    return co.wrap(function* (converter) {
       try {
         const holder = []
-        // checks if its an array and push converted img to the array
+          // checks if its an array and push converted img to the array
         if (typeof images.length === 'number') {
           for (let i = 0; i < images.length; i++) {
             holder.push(yield converter(images[i]))
           }
-          return Promise.resolve(yield Image.create({imgs: holder}))
+          return Promise.resolve(yield Image.create({
+            imgs: holder
+          }))
         }
 
         holder.push(yield converter(images))
-        return Promise.resolve(yield Image.create({imgs: holder}))
+        return Promise.resolve(yield Image.create({
+          imgs: holder
+        }))
       }
       catch (e) {
         log.warn(e)
