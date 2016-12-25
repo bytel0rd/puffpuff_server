@@ -18,4 +18,6 @@ module.exports = class DefaultController extends Controller {
     res.status(200).json(this.app.services.DefaultService.getApplicationInfo())
   }
 
+  public(req, res) {}
+
 }

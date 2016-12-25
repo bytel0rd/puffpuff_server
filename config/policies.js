@@ -20,7 +20,8 @@ module.exports = {
     feedBase: ['Passport.jwt']
   },
   DefaultController: {
-    info: ['Auth.loginUser']
+    info: ['Auth.loginUser'],
+    public: ['StaticFile.publicRoute']
   },
   IActionController: {
     info: ['Auth.ifToken'],

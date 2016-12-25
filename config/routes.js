@@ -110,6 +110,12 @@ module.exports = [
     method: ['POST'],
     path: '/auth/signUp',
     handler: 'UserController.signUp'
+  },
+
+  {
+    method: ['GET'],
+    path: '/public',
+    handler: 'DefaultController.public'
   }
   // ,
   //

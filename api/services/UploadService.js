@@ -5,6 +5,7 @@ const multer = require('multer')
 const jimp = require('jimp')
 const co = require('co')
 const mkdirp = require('mkdirp')
+const path = require('path')
 
 const MAX_IMG_HEIGHT = 720
 const MAX_IMG_WIDTH = 1280
@@ -14,7 +15,11 @@ const FEED_IMG_WIDTH = 320
 
 const THUMBNAIL_WIDTH = 80
 
-const storagePath = '/public/images'
+function setStoragePath(url) {
+  if (!process.env.OPENSHIFT_DATA_DIR) return undefined
+  return path.resolve(process.env.OPENSHIFT_DATA_DIR, url)
+}
+const storagePath = setStoragePath('/images') || '/public/images'
 
 /**
  * resizeImg(inital, final, getInital)

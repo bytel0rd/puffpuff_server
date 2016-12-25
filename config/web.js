@@ -52,12 +52,12 @@ module.exports = {
   /**
    * The port to bind the web server to
    */
-  port: process.env.PORT || 3000,
+  port: process.env.PORT || process.env.OPENSHIFT_NODEJS_PORT || 3000,
 
   /**
    * The host to bind the web server to
    */
-  host: process.env.HOST || '0.0.0.0'
+  host: process.env.HOST || process.env.OPENSHIFT_NODEJS_IP || '0.0.0.0'
 
   /**
    * Alternate method to add multiple template engine, for single view template use config.views.engine
