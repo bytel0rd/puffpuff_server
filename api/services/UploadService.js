@@ -19,7 +19,7 @@ function setStoragePath(url) {
   if (!process.env.OPENSHIFT_DATA_DIR) return undefined
   return path.resolve(process.env.OPENSHIFT_DATA_DIR, url)
 }
-const storagePath = setStoragePath('/images') || '/public/images'
+const storagePath = setStoragePath('images') || '/public/images'
 
 /**
  * resizeImg(inital, final, getInital)

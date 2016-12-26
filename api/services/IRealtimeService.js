@@ -3,6 +3,7 @@
 const Service = require('trails-service')
 
 const USER_ROOM = {} // stores current user room
+const USER_SOCKET = {}
 
 /**
  * @module IRealtimeService
@@ -39,6 +40,7 @@ module.exports = class IRealtimeService extends Service {
     this.app.sockets.on('connection', (spark) => {
       // listens for when user wants to change room
       spark.on('user:room:change', (data) => {
+        USER_SOCKET[data.id || spark.id] = spark.id
         this.changeRoom(spark, data.id || spark.id, data.room)
       })
       // listens for when users wants to get all room users
@@ -68,15 +70,16 @@ module.exports = class IRealtimeService extends Service {
    * @return {[type]}        [description]
    */
   leaveRoom(spark ,userId, room) {
-    if (USER_ROOM[userId]) {
-      // sends leave callback mgs to user
-      const formerRoom = USER_ROOM[userId]
-      spark.leave(room, () => {
-        spark.emit('user:leave:room', {mgs: 'you have leaved room ' + room})
-        // informing who is leaving to other users that someone leaved
-        spark.room(formerRoom).emit('other:leaved:room', {mgs: userId + ' leaved the room'})
-      })
-    }
+    if (!USER_ROOM[userId] || USER_ROOM[userId] === room) return
+    // sends leave callback mgs to user
+    const formerRoom = USER_ROOM[userId]
+    spark.leave(room, () => {
+      spark.emit('user:leave:room', {mgs: 'you have leaved room ' + room})
+      // informing who is leaving to other users that someone leaved
+      const sparkId = USER_SOCKET[userId]
+      spark.room(formerRoom).except(sparkId)
+        .emits('other:leaved:room', {mgs: sparkId + ' leaved the room'})
+    })
   }
 
   /**
@@ -91,7 +94,7 @@ module.exports = class IRealtimeService extends Service {
     // sends join callback mgs to user
     spark.join(room, () => {
       spark.emit('user:join:room', {mgs: 'you have joined room ' + room})
-      console.log(USER_ROOM)
+      console.log(USER_ROOM, USER_SOCKET)
       console.log(this.app.sockets.room(room).clients())
       // sends mgs to all user in the room that someone joined
       spark.room(room).except(userId).emits('other:joined:room',

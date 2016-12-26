@@ -4,10 +4,10 @@ const JwtStrategy = require('passport-jwt').Strategy
 const ExtractJwt = require('passport-jwt').ExtractJwt
 
 const EXPIRES_IN_SECONDS = process.env.JWT_EXPIRES || 60 * 60 * 24
-const SECRET = process.env.JWT_SECRET || 'mysupersecuretoken'
+const SECRET = process.env.JWT_SECRET || process.env.OPENSHIFT_SECRET_TOKEN || 'mysupersecuretoken'
 const ALGORITHM = process.env.JWT_ALGORITHM || 'HS256'
-const ISSUER =  process.env.JWT_ISSUER || 'localhost'
-const AUDIENCE =  process.env.JWT_AUDIENCE || 'localhost'
+const ISSUER =  process.env.JWT_ISSUER || process.env.OPENSHIFT_NODEJS_IP || 'localhost'
+const AUDIENCE =  process.env.JWT_AUDIENCE || process.env.OPENSHIFT_NODEJS_IP || 'localhost'
 
 module.exports = {
   redirect: {
