@@ -41,7 +41,7 @@ module.exports = class IRealtimeService extends Service {
       // listens for when user wants to change room
       spark.on('user:room:change', (data) => {
         USER_SOCKET[data.id || spark.id] = spark.id
-        this.changeRoom(spark, data.id || spark.id, data.room)
+        this.changeRoom(spark, data.id || spark.id, data.room, data.username)
       })
       // listens for when users wants to get all room users
       spark.on('room:get:users', (roomId) => {
@@ -57,9 +57,9 @@ module.exports = class IRealtimeService extends Service {
    * @param  {[string]} room   [description] new Room for user
    * @return {[type]}        [description]
    */
-  changeRoom(spark ,userId, room) {
-    this.leaveRoom(spark, userId, room)
-    this.joinRoom(spark, userId, room)
+  changeRoom(spark ,userId, room, username) {
+    this.leaveRoom(spark, userId, room, username)
+    this.joinRoom(spark, userId, room, username)
   }
 
   /**
@@ -69,7 +69,7 @@ module.exports = class IRealtimeService extends Service {
    * @param  {[string]} room   [description] new Room for user
    * @return {[type]}        [description]
    */
-  leaveRoom(spark ,userId, room) {
+  leaveRoom(spark ,userId, room, username) {
     if (!USER_ROOM[userId] || USER_ROOM[userId] === room) return
     // sends leave callback mgs to user
     const formerRoom = USER_ROOM[userId]
@@ -78,7 +78,7 @@ module.exports = class IRealtimeService extends Service {
       // informing who is leaving to other users that someone leaved
       const sparkId = USER_SOCKET[userId]
       spark.room(formerRoom).except(sparkId)
-        .emits('other:leaved:room', {mgs: sparkId + ' leaved the room'})
+        .emits('other:leaved:room', {mgs: (username || userId ) + ' leaved the room'})
     })
   }
 
@@ -97,7 +97,8 @@ module.exports = class IRealtimeService extends Service {
       console.log(USER_ROOM, USER_SOCKET)
       console.log(this.app.sockets.room(room).clients())
       // sends mgs to all user in the room that someone joined
-      spark.room(room).except(userId).emits('other:joined:room',
+      const sparkId = USER_SOCKET[userId]
+      spark.room(room).except(sparkId).emits('other:joined:room',
        {mgs: userId + ' just joined room'})
     })
   }
