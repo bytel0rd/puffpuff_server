@@ -1,4 +1,4 @@
-const bodyParser = require('body-Parser')
+// const bodyParser = require('body-Parser')
 const middlewares = {}
 const _ = require('lodash')
 const path = require('path')
@@ -24,10 +24,10 @@ middlewares.order = [
 /**
  * Middlewares to load for body parsing  */
 middlewares.bodyParser = [
-  bodyParser.json(),
-  bodyParser.urlencoded({
-    extended: false
-  })
+  // bodyParser.json(),
+  // bodyParser.urlencoded({
+  //   extended: false
+  // })
 ]
 
 middlewares.images = function (req, res, next) {
