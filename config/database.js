@@ -51,6 +51,6 @@ module.exports = {
 
   models: {
     defaultStore: 'stage',
-    migrate: 'alter'
+    migrate: 'safe'
   }
 }
