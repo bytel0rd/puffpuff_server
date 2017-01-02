@@ -26,7 +26,7 @@ module.exports = class RaccoonService extends Service {
     this.raccoon.config.nearestNeighors = rConfig.nearestNeighors
     this.raccoon.config.className = rConfig.className
     this.raccoon.factorLeastSimilarLeastLiked = rConfig.factorLeastSimilarLeastLiked
-    this.raccoon.connect(rAuth.port, rAuth.host, rAuth.auth)
+    this.raccoon.connect(rAuth.port, rAuth.host, rAuth.auth.password)
     this.app.log.info('connected to redis instance', rAuth)
   }
 
