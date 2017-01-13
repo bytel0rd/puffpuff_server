@@ -5,6 +5,15 @@ const Service = require('trails-service')
 const USER_ROOM = {} // stores current user room
 const USER_SOCKET = {}
 
+const USER_LEAVE_ROOM = 'user:leave:room'
+const USER_ROOM_CHANGE = 'user:room:change'
+const USER_JOIN_ROOM = 'user:join:room'
+const  OTHER_LEAVED_ROOM = 'other:leaved:room'
+const USER_JOINED_ROOM = 'other:joined:room'
+const ROOM_NEW_REPLY = 'room:new:reply'
+const ROOM_USERS_ALL = 'room:users:all'
+const ROOM_GET_USERS  = 'room:get:users'
+
 /**
  * @module IRealtimeService
  * @description TODO document Service
@@ -38,13 +47,14 @@ module.exports = class IRealtimeService extends Service {
    */
   events() {
     this.app.sockets.on('connection', (spark) => {
+      spark.emit('user:connected', 'user just connected to realtime websockets')
       // listens for when user wants to change room
-      spark.on('user:room:change', (data) => {
+      spark.on(USER_ROOM_CHANGE, (data) => {
         USER_SOCKET[data.id || spark.id] = spark.id
         this.changeRoom(spark, data.id || spark.id, data.room, data.username)
       })
       // listens for when users wants to get all room users
-      spark.on('room:get:users', (roomId) => {
+      spark.on(ROOM_GET_USERS, (roomId) => {
         this.roomUsers(roomId)
       })
     })
@@ -74,11 +84,10 @@ module.exports = class IRealtimeService extends Service {
     // sends leave callback mgs to user
     const formerRoom = USER_ROOM[userId]
     spark.leave(room, () => {
-      spark.emit('user:leave:room', {mgs: 'you have leaved room ' + room})
+      spark.emit(USER_LEAVE_ROOM, {mgs: 'you have leaved room ' + room})
       // informing who is leaving to other users that someone leaved
-      const sparkId = USER_SOCKET[userId]
-      spark.room(formerRoom).except(sparkId)
-        .emits('other:leaved:room', {mgs: (username || userId ) + ' leaved the room'})
+      this.notifyRoom(formerRoom, OTHER_LEAVED_ROOM,
+        {mgs: (username || userId ) + ' leaved the room'})
     })
   }
 
@@ -93,13 +102,11 @@ module.exports = class IRealtimeService extends Service {
     USER_ROOM[userId] = room
     // sends join callback mgs to user
     spark.join(room, () => {
-      spark.emit('user:join:room', {mgs: 'you have joined room ' + room})
-      console.log(USER_ROOM, USER_SOCKET)
-      console.log(this.app.sockets.room(room).clients())
+      spark.emit(USER_JOIN_ROOM, {mgs: 'you have joined room ' + room})
+      // console.log(USER_ROOM, USER_SOCKET)
       // sends mgs to all user in the room that someone joined
-      const sparkId = USER_SOCKET[userId]
-      spark.room(room).except(sparkId).emits('other:joined:room',
-       {mgs: userId + ' just joined room'})
+      this.notifyRoom(room, USER_JOINED_ROOM,
+         {mgs: userId + ' just joined room'})
     })
   }
 
@@ -119,7 +126,31 @@ module.exports = class IRealtimeService extends Service {
    */
   roomUsers(roomId) {
     // sends the room Users to a new user
-    this.app.sockets.room(roomId).emits('room:users:all', this.app.sockets.room(roomId).clients())
+    this.notifyRoom(roomId, ROOM_USERS_ALL, this.app.sockets.room(roomId).clients())
+  }
+
+  /**
+   * [notifyRoom description]
+   * gets individual room sparks and notify
+   * them with the evnts and data
+   * @param  {[string]} roomId [description]
+   * @param  {[string]} event  [description]
+   * @param  {[any]} data   [description]
+   * @return {[type]}        [description]
+   */
+  notifyRoom(roomId, event, data) {
+    // let roomUser
+    // this.app.sockets.room(roomId).clients((roomUsers) => {
+    //   console.log('roomUsers', roomUsers);
+    //   for (const roomUser of roomUsers) {
+    //     console.log(roomUser, 'is in room ', roomId)
+    //     this.app.sockets.spark(roomUser).emit(event, data)
+    //   }
+    // })
+    const roomUsers = this.app.sockets.room(roomId).clients()
+    for (const roomUser of roomUsers) {
+      this.app.sockets.spark(roomUser).emit(event, data)
+    }
   }
 
   /**
@@ -129,7 +160,8 @@ module.exports = class IRealtimeService extends Service {
    */
   roomEmit(data) {
     // map reply baseId to the roomId
-    this.app.sockets.room(data.base.id).emits('room:new:reply', data)
+    // this.app.sockets.room(data.base.id).emits(ROOM_NEW_REPLY, data)
+    this.notifyRoom(data.base.id, ROOM_NEW_REPLY, data)
   }
 
 }
